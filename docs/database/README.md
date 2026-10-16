@@ -3,6 +3,8 @@
 PostgreSQL 16, schema `aether`, managed by Flyway (see [ADR-0003](../adr/0003-database-schema-baseline.md)
 and [ADR-0004](../adr/0004-schema-migrations-with-flyway.md)).
 
+Design: [relational schema and normalisation](relational-schema.md) (keys, types, 3NF review, known gaps).
+
 ## Where things are
 
 | Path | Content |
