@@ -10,7 +10,7 @@ name: aether
 
 services:
   postgres:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${AETHER_DB_NAME:-aether}
