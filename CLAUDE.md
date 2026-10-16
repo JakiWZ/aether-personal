@@ -17,7 +17,7 @@ atomic transfers, auditable state changes) must hold **server-side**, never only
 | Path | Content |
 |------|---------|
 | `backend/` | Spring Boot REST API (Java 21, Maven). Flyway migrations in `src/main/resources/db/migration`. |
-| `frontend/` | Angular SPA (standalone components, signals). |
+| `frontend/` | Angular 22 SPA (standalone components, signals, zoneless). Layout in `frontend/README.md`. |
 | `infrastructure/` | Docker Compose for local dev, later IaC. |
 | `docs/requirements/` | Client requirements (capitolato): functional reqs, business rules `BR-xxx`, NFRs. |
 | `docs/sprints/` | Sprint mission packs with detailed acceptance criteria per story. |
@@ -94,7 +94,7 @@ PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture
 
 ## Commands
 
-> Keep this section in sync with the README. Frontend (#12) adds its commands when bootstrapped.
+> Keep this section in sync with the README.
 
 ```bash
 # Database: PostgreSQL 16 on localhost:5432 (db/user/password: aether)
@@ -106,6 +106,13 @@ docker compose -f infrastructure/docker-compose.yml down -v                     
 ./mvnw spring-boot:run
 ./mvnw test      # fast tests, no Docker
 ./mvnw verify    # + Testcontainers integration tests (*IT), needs Docker
+
+# Frontend (from frontend/, Node.js 24): http://localhost:4200, proxies /api to :8080
+npm ci
+npm start
+npm test                              # Vitest, single run
+npm run lint && npm run format:check  # ESLint (OnPush + a11y rules) and Prettier
+npm run build
 ```
 
 New migration: `backend/src/main/resources/db/migration/V<next>__<verb>_<object>.sql`.
