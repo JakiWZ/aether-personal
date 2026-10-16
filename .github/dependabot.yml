@@ -15,3 +15,10 @@ updates:
     directory: /infrastructure
     schedule:
       interval: monthly
+    ignore:
+      # Major database upgrades are architecture decisions (ADR-0002), not routine bumps.
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]
+      # Keep the Flyway CLI on the major managed by Spring Boot (ADR-0004).
+      - dependency-name: flyway/flyway
+        update-types: ["version-update:semver-major"]
