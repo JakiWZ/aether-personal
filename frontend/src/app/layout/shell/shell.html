@@ -1,0 +1,24 @@
+<a class="skip-link" href="#main-content">Vai al contenuto principale</a>
+<header>
+  <a class="brand" routerLink="/dashboard">AETHER</a>
+  <nav aria-label="Navigazione principale">
+    <ul>
+      <li>
+        <a routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page"
+          >Mission Control</a
+        >
+      </li>
+      @for (d of domains; track d.path) {
+        <li>
+          <a [routerLink]="['/', d.path]" routerLinkActive="active" ariaCurrentWhenActive="page">{{
+            d.label
+          }}</a>
+        </li>
+      }
+    </ul>
+  </nav>
+  <app-backend-status />
+</header>
+<main id="main-content" tabindex="-1">
+  <router-outlet />
+</main>
