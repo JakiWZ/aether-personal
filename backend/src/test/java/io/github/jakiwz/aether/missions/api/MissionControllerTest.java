@@ -64,12 +64,11 @@ class MissionControllerTest {
     }
 
     @Test
-    void ignoresAStatusSentByTheClient() {
-        given(service.create(any())).willReturn(JEZERO);
-
+    void rejectsAStatusSentByTheClient() {
         assertThat(post(VALID_BODY.replace("\"priority\"", "\"status\":\"APPROVED\",\"priority\"")))
-                .hasStatus(HttpStatus.CREATED)
-                .bodyJson().extractingPath("$.status").isEqualTo("DRAFT");
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().extractingPath("$.code").isEqualTo("MALFORMED_REQUEST");
+        verify(service, never()).create(any());
     }
 
     @Test
