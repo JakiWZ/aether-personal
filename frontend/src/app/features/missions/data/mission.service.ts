@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { APP_CONFIG } from '../../../core/config/app-config';
+import { DEFAULT_PAGE_SIZE, Page, withPage } from '../../../core/http/page';
 
 /** Values of `ck_mission_status`; new missions are always DRAFT (PHX-201). */
 export const MISSION_STATUSES = [
@@ -123,9 +124,11 @@ export class MissionService {
     return `${this.config.apiBaseUrl}/missions`;
   }
 
-  /** Every mission, ordered by planned start. */
-  list(): Observable<Mission[]> {
-    return this.http.get<Mission[]>(this.url);
+  /** One page of missions, ordered by planned start, then code. */
+  list(page = 0, size = DEFAULT_PAGE_SIZE): Observable<Page<Mission>> {
+    return this.http.get<Page<Mission>>(this.url, {
+      params: withPage(new HttpParams(), page, size),
+    });
   }
 
   /** Drafts a mission; the server normalises the code and assigns status DRAFT. */

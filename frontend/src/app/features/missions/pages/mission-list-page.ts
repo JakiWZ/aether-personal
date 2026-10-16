@@ -12,6 +12,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
 import { ApiError, toApiError } from '../../../core/http/api-error';
+import { Page } from '../../../core/http/page';
+import { Pager } from '../../../shared/ui/pager/pager';
 import {
   MISSION_PRIORITY_LABELS,
   MISSION_STATUS_LABELS,
@@ -23,14 +25,14 @@ import {
 
 type ViewState =
   | { readonly kind: 'loading' }
-  | { readonly kind: 'loaded'; readonly missions: readonly Mission[] }
+  | { readonly kind: 'loaded'; readonly page: Page<Mission> }
   | { readonly kind: 'error'; readonly error: ApiError };
 
 /** PHX-201: missions with their planned window, read back from the server after every creation. */
 @Component({
   selector: 'app-mission-list-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, Pager, RouterLink],
   templateUrl: './mission-list-page.html',
   styleUrls: ['../../../shared/styles/data-view.scss', './mission-list-page.scss'],
 })
@@ -47,10 +49,11 @@ export class MissionListPage {
   protected readonly priorityLabels = MISSION_PRIORITY_LABELS;
   protected readonly safetyLabels = SAFETY_LEVEL_LABELS;
 
-  protected readonly missions = computed(() => {
+  protected readonly missionPage = computed(() => {
     const state = this.state();
-    return state.kind === 'loaded' ? state.missions : null;
+    return state.kind === 'loaded' ? state.page : null;
   });
+  private pageIndex = 0;
   protected readonly error = computed(() => {
     const state = this.state();
     return state.kind === 'error' ? state.error : null;
@@ -60,13 +63,14 @@ export class MissionListPage {
     this.load();
   }
 
-  protected load(): void {
+  protected load(page = this.pageIndex): void {
+    this.pageIndex = page;
     this.state.set({ kind: 'loading' });
     this.service
-      .list()
+      .list(page)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (missions) => this.state.set({ kind: 'loaded', missions }),
+        next: (result) => this.state.set({ kind: 'loaded', page: result }),
         error: (error: unknown) => this.state.set({ kind: 'error', error: toApiError(error) }),
       });
   }

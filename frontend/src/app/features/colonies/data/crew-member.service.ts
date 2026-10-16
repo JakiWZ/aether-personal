@@ -1,8 +1,9 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { APP_CONFIG } from '../../../core/config/app-config';
+import { DEFAULT_PAGE_SIZE, Page, withPage } from '../../../core/http/page';
 
 /** Values of `ck_crew_status`, mirrored by the backend `CrewStatus` enum (ARES-103). */
 export const CREW_STATUSES = [
@@ -64,9 +65,11 @@ export class CrewMemberService {
     return `${this.config.apiBaseUrl}/crew-members`;
   }
 
-  /** Every crew member, ordered by employee code. */
-  list(): Observable<CrewMember[]> {
-    return this.http.get<CrewMember[]>(this.url);
+  /** One page of crew members, ordered by employee code. */
+  list(page = 0, size = DEFAULT_PAGE_SIZE): Observable<Page<CrewMember>> {
+    return this.http.get<Page<CrewMember>>(this.url, {
+      params: withPage(new HttpParams(), page, size),
+    });
   }
 
   /** Registers a crew member; the server normalises the code and email. */

@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { TEST_CONFIG, provideTestConfig } from '../../../testing/test-config';
+import { TEST_CONFIG, pageOf, provideTestConfig } from '../../../testing/test-config';
 import { CrewMemberService, NewCrewMember } from './crew-member.service';
 
 describe('CrewMemberService', () => {
@@ -20,12 +20,23 @@ describe('CrewMemberService', () => {
 
   afterEach(() => http.verify());
 
-  it('lists crew members from the configured API URL', () => {
+  it('asks the configured API URL for the first page of crew members by default', () => {
     service.list().subscribe();
 
-    const req = http.expectOne(url);
+    const req = http.expectOne((r) => r.url === url);
     expect(req.request.method).toBe('GET');
-    req.flush([]);
+    expect(req.request.params.get('page')).toBe('0');
+    expect(req.request.params.get('size')).toBe('20');
+    req.flush(pageOf([]));
+  });
+
+  it('asks for the requested page', () => {
+    service.list(3, 50).subscribe();
+
+    const req = http.expectOne((r) => r.url === url);
+    expect(req.request.params.get('page')).toBe('3');
+    expect(req.request.params.get('size')).toBe('50');
+    req.flush(pageOf([], 3, 50));
   });
 
   it('posts a new crew member', () => {

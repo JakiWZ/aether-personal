@@ -59,8 +59,8 @@ class MissionCreationIT {
                         {"code":"PHX-020","title":"Jezero delta survey","description":null,
                          "objectives":["Map the delta front"],"type":"EXPLORATION","originColonyCode":"ARS-01",
                          "status":"DRAFT","priority":"HIGH","safetyLevel":"ELEVATED","createdBy":"system"}""");
-        assertThat(mvc.get().uri("/api/v1/missions"))
-                .bodyJson().extractingPath("$[*].code").asArray().contains("PHX-001", "PHX-020");
+        assertThat(mvc.get().uri("/api/v1/missions?size=100"))
+                .bodyJson().extractingPath("$.items[*].code").asArray().contains("PHX-001", "PHX-020");
     }
 
     @Test

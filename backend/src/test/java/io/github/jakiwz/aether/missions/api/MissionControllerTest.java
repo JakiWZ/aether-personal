@@ -2,6 +2,7 @@ package io.github.jakiwz.aether.missions.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -20,6 +21,8 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -51,6 +54,25 @@ class MissionControllerTest {
     MissionService service;
 
     @Test
+    void listsTheFirstPageByDefault() {
+        given(service.list(0, 20)).willReturn(new PageImpl<>(List.of(JEZERO), PageRequest.of(0, 20), 1));
+
+        assertThat(mvc.get().uri("/api/v1/missions"))
+                .hasStatusOk()
+                .bodyJson().isLenientlyEqualTo("""
+                        {"items":[{"code":"PHX-020","objectives":["Map the delta front"]}],
+                         "page":0,"size":20,"totalItems":1,"totalPages":1}""");
+    }
+
+    @Test
+    void refusesANegativePage() {
+        assertThat(mvc.get().uri("/api/v1/missions?page=-1"))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().extractingPath("$.errors[0].field").isEqualTo("page");
+        verify(service, never()).list(anyInt(), anyInt());
+    }
+
+    @Test
     void draftsAMissionAndPointsToIt() {
         given(service.create(any())).willReturn(JEZERO);
 
@@ -64,12 +86,11 @@ class MissionControllerTest {
     }
 
     @Test
-    void ignoresAStatusSentByTheClient() {
-        given(service.create(any())).willReturn(JEZERO);
-
+    void rejectsAStatusSentByTheClient() {
         assertThat(post(VALID_BODY.replace("\"priority\"", "\"status\":\"APPROVED\",\"priority\"")))
-                .hasStatus(HttpStatus.CREATED)
-                .bodyJson().extractingPath("$.status").isEqualTo("DRAFT");
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().extractingPath("$.code").isEqualTo("MALFORMED_REQUEST");
+        verify(service, never()).create(any());
     }
 
     @Test

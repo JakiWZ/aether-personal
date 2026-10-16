@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 import io.github.jakiwz.aether.crew.domain.CrewErrorCode;
 import io.github.jakiwz.aether.crew.domain.CrewMember;
@@ -12,9 +13,12 @@ import io.github.jakiwz.aether.crew.domain.CrewMemberService;
 import io.github.jakiwz.aether.crew.domain.CrewStatus;
 import io.github.jakiwz.aether.shared.error.BusinessRuleViolationException;
 import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -39,6 +43,24 @@ class CrewMemberControllerTest {
 
     @MockitoBean
     CrewMemberService service;
+
+    @Test
+    void listsOnePageOfMembers() {
+        given(service.list(1, 10)).willReturn(new PageImpl<>(List.of(ANNA), PageRequest.of(1, 10), 11));
+
+        assertThat(mvc.get().uri("/api/v1/crew-members?page=1&size=10"))
+                .hasStatusOk()
+                .bodyJson().isLenientlyEqualTo("""
+                        {"items":[{"employeeCode":"CRW-020"}],"page":1,"size":10,"totalItems":11,"totalPages":2}""");
+    }
+
+    @Test
+    void refusesAPageLargerThanTheServerLimit() {
+        assertThat(mvc.get().uri("/api/v1/crew-members?size=1000"))
+                .hasStatus(HttpStatus.BAD_REQUEST)
+                .bodyJson().extractingPath("$.errors[0].field").isEqualTo("size");
+        verifyNoInteractions(service);
+    }
 
     @Test
     void registersAMemberAndPointsToIt() {

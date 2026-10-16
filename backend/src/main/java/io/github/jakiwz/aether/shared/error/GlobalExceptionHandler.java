@@ -98,7 +98,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             @Nullable Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
         if (body instanceof ProblemDetail problem
                 && (problem.getProperties() == null || !problem.getProperties().containsKey(CODE))) {
-            problem.setProperty(CODE, defaultCode(statusCode));
+            problem.setProperty(CODE, ErrorCode.forStatus(statusCode));
         }
         return super.createResponseEntity(body, headers, statusCode, request);
     }
@@ -116,20 +116,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    /** A value that could not even be converted (page=abc) gets a generic message, not the Java type names. */
     private static FieldViolation toViolation(FieldError error) {
-        return new FieldViolation(error.getField(), error.getDefaultMessage());
-    }
-
-    private static String defaultCode(HttpStatusCode status) {
-        return switch (status.value()) {
-            case 400 -> ErrorCode.MALFORMED_REQUEST;
-            case 404 -> ErrorCode.RESOURCE_NOT_FOUND;
-            case 405 -> ErrorCode.METHOD_NOT_ALLOWED;
-            case 415 -> ErrorCode.UNSUPPORTED_MEDIA_TYPE;
-            default -> {
-                HttpStatus resolved = HttpStatus.resolve(status.value());
-                yield resolved != null ? resolved.name() : ErrorCode.INTERNAL_ERROR;
-            }
-        };
+        return new FieldViolation(error.getField(),
+                error.isBindingFailure() ? "has an invalid value" : error.getDefaultMessage());
     }
 }

@@ -2,12 +2,16 @@ package io.github.jakiwz.aether.missions.api;
 
 import io.github.jakiwz.aether.missions.domain.Mission;
 import io.github.jakiwz.aether.missions.domain.MissionService;
+import io.github.jakiwz.aether.shared.web.PageQuery;
+import io.github.jakiwz.aether.shared.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.net.URI;
 import java.util.List;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,14 +34,16 @@ class MissionController {
 
     @GetMapping
     @Operation(summary = "List missions", description = "Ordered by planned start, then code.")
-    List<MissionResponse> list() {
-        return service.list().stream().map(MissionResponse::from).toList();
+    @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: page or size out of range")
+    PageResponse<MissionResponse> list(@ParameterObject @Valid PageQuery query) {
+        return PageResponse.from(service.list(query.pageOrDefault(), query.sizeOrDefault()), MissionResponse::from);
     }
 
     @GetMapping("/{code}")
     @Operation(summary = "Get a mission by code")
+    @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: code longer than 60 characters")
     @ApiResponse(responseCode = "404", description = "RESOURCE_NOT_FOUND")
-    MissionResponse get(@PathVariable String code) {
+    MissionResponse get(@PathVariable @Size(max = 60) String code) {
         return MissionResponse.from(service.get(code));
     }
 

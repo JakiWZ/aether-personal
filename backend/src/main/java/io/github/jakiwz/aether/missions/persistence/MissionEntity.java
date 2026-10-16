@@ -23,6 +23,7 @@ import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.hibernate.annotations.BatchSize;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -82,6 +83,7 @@ public class MissionEntity {
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.PERSIST)
     @OrderBy("sequenceNo")
+    @BatchSize(size = 100) // loads the objectives of a whole page (at most 100 missions) in one query
     private List<MissionObjectiveEntity> objectives = new ArrayList<>();
 
     protected MissionEntity() {
