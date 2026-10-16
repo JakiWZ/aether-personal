@@ -1,9 +1,11 @@
 <h1>Crew</h1>
 <p class="intro">Operational profiles of the crew members.</p>
 
-<div class="toolbar">
-  <a routerLink="new">New crew member</a>
-</div>
+@if (canCreate()) {
+  <div class="toolbar">
+    <a routerLink="new">New crew member</a>
+  </div>
+}
 
 @if (created(); as code) {
   <p class="message success" role="status">Crew member {{ code }} registered.</p>

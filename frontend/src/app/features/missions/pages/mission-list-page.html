@@ -1,9 +1,11 @@
 <h1>Missions</h1>
 <p class="intro">Missions of every base with their planned window. Times are in UTC.</p>
 
-<div class="toolbar">
-  <a routerLink="new">New mission</a>
-</div>
+@if (canCreate()) {
+  <div class="toolbar">
+    <a routerLink="new">New mission</a>
+  </div>
+}
 
 @if (created(); as code) {
   <p class="message success" role="status">Mission {{ code }} drafted.</p>

@@ -47,6 +47,7 @@ host change `environment.ts`, not the code.
 ```text
 src/app/
   core/          app-wide singletons, no UI
+    auth/          session, login/logout, route guards, 401 interceptor (ADR-0012)
     config/        APP_CONFIG token
     http/          RFC 9457 Problem Details → ApiError mapping (ADR-0005)
     health/        backend health check
@@ -57,7 +58,8 @@ src/app/
     dashboard/     Mission Control (CROSS)
     colonies/      ARES       missions/   PHOENIX     fleet/   TITAN
     inventory/     ORION      incidents/  HELIOS      not-found/
-  testing/       test helpers
+    login/         sign-in page
+  testing/       test helpers (test config, page envelope, `signIn`)
 ```
 
 A feature exposes a `<feature>.routes.ts` with its routes; `app.routes.ts` lazy-loads it with

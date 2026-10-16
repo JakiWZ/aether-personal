@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
+import { AuthService } from '../../../core/auth/auth.service';
 import { ApiError, toApiError } from '../../../core/http/api-error';
 import { Page } from '../../../core/http/page';
 import { Pager } from '../../../shared/ui/pager/pager';
@@ -31,10 +32,13 @@ type ViewState =
 export class CrewListPage {
   private readonly crew = inject(CrewMemberService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
 
   /** Employee code of a member just registered, from the `created` query parameter. */
   readonly created = input<string>();
 
+  /** Only offered to who may do it; the server refuses the others anyway. */
+  protected readonly canCreate = computed(() => this.auth.hasPermission('CREW_MANAGE'));
   protected readonly state = signal<ViewState>({ kind: 'loading' });
   protected readonly statusLabels = CREW_STATUS_LABELS;
 

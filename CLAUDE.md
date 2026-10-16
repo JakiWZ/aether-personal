@@ -85,6 +85,10 @@ PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture
   property; no stack traces leak to clients.
 - API documented with OpenAPI (springdoc). Paths are plural nouns under `/api/v1`.
   List endpoints are paginated (`page`, `size` ≤ 100) and return `PageResponse` (ADR-0011).
+- Security (ADR-0012): session cookie + CSRF token, deny by default. Every endpoint carries
+  `@PreAuthorize` with a permission code from the `permission` table (`ArchitectureTest` checks it).
+  `@WebMvcTest`s `@Import(SecurityConfig.class)`, use `@WithMockUser(authorities = …)` and
+  `.with(csrf())` on writes, and include the 401/403 negative cases.
 - Tests: JUnit 5 + AssertJ; integration tests with **Testcontainers PostgreSQL** (never H2);
   `@WebMvcTest` for controller contracts. Every business rule has a negative test.
 
@@ -94,6 +98,7 @@ PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture
 - Every data view handles loading, empty and error states. Forms use typed reactive forms;
   client validation is for UX only — the server is authoritative.
 - Accessibility (labels, keyboard navigation, contrast) is part of done.
+- Feature routes use `authGuard`; hide actions with `AuthService.hasPermission` (UX only).
 
 ## Commands
 
