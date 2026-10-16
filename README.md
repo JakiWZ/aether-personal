@@ -42,8 +42,15 @@ docs/
 
 ## Getting started
 
-> The stack is being bootstrapped incrementally; this section grows with each foundation task
-> (database #9, backend #11, frontend #12).
+Prerequisites: Docker, Java 21.
+
+```bash
+# 1. database: PostgreSQL 16 with defaults from .env.example
+docker compose -f infrastructure/docker-compose.yml up -d
+```
+
+Details and schema documentation: [`docs/database/README.md`](docs/database/README.md).
+Backend (#11) and frontend (#12) instructions are added as they are bootstrapped.
 
 ## How we work
 
