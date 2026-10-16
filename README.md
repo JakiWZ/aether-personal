@@ -47,10 +47,18 @@ Prerequisites: Docker, Java 21.
 ```bash
 # 1. database: PostgreSQL 16 with defaults from .env.example
 docker compose -f infrastructure/docker-compose.yml up -d
+
+# 2. backend: applies migrations on startup
+cd backend && ./mvnw spring-boot:run
 ```
 
-Details and schema documentation: [`docs/database/README.md`](docs/database/README.md).
-Backend (#11) and frontend (#12) instructions are added as they are bootstrapped.
+| URL | What |
+|-----|------|
+| http://localhost:8080/swagger-ui.html | API documentation (OpenAPI) |
+| http://localhost:8080/actuator/health | Health check |
+
+More: [`backend/README.md`](backend/README.md), [`docs/database/README.md`](docs/database/README.md).
+Frontend (#12) instructions are added when it is bootstrapped.
 
 ## How we work
 

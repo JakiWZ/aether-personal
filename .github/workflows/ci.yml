@@ -89,18 +89,29 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+          cache: maven
 
+      # `verify` runs unit tests (surefire) and Testcontainers integration tests (failsafe).
       - name: Build/test backend
         if: steps.backend.outputs.exists == 'true'
         shell: bash
+        working-directory: backend
         run: |
-          if [ -f backend/mvnw ]; then
-            chmod +x backend/mvnw
-            cd backend
-            ./mvnw -B test
+          if [ -f mvnw ]; then
+            chmod +x mvnw
+            ./mvnw -B -ntp verify
           else
-            mvn -B -f backend/pom.xml test
+            mvn -B -ntp verify
           fi
+
+      - name: Upload test reports
+        if: failure() && steps.backend.outputs.exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-test-reports
+          path: |
+            backend/target/surefire-reports
+            backend/target/failsafe-reports
 
       - name: Backend not initialized
         if: steps.backend.outputs.exists != 'true'
