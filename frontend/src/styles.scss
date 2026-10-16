@@ -1,0 +1,42 @@
+// Design tokens. Colour pairs meet WCAG AA contrast (NFR-010).
+:root {
+  --aether-bg: #f7f5f3;
+  --aether-surface: #ffffff;
+  --aether-text: #1c1b1a;
+  --aether-text-muted: #595552;
+  --aether-border: #d9d4cf;
+  --aether-accent: #c1440e;
+  --aether-link: #9a3209;
+  --aether-header-bg: #2a1a14;
+  --aether-header-text: #ffffff;
+  --aether-ok: #1e7b3a;
+  --aether-danger: #b3261e;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  line-height: 1.5;
+  color: var(--aether-text);
+  background: var(--aether-bg);
+}
+
+a {
+  color: var(--aether-link);
+}
+
+:focus-visible {
+  outline: 3px solid var(--aether-accent);
+  outline-offset: 2px;
+}

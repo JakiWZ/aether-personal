@@ -22,7 +22,7 @@ following Scrum, GitHub Flow and an AI-assisted engineering workflow with
 
 ## Tech stack
 
-Java 21 · Spring Boot 4 · PostgreSQL 16 · Flyway · Testcontainers · Angular · Docker Compose ·
+Java 21 · Spring Boot 4 · PostgreSQL 16 · Flyway · Testcontainers · Angular 22 · Docker Compose ·
 GitHub Actions. Rationale in [ADR-0002](docs/adr/0002-technology-stack.md).
 
 ## Repository layout
@@ -42,7 +42,7 @@ docs/
 
 ## Getting started
 
-Prerequisites: Docker, Java 21.
+Prerequisites: Docker, Java 21, Node.js 24 LTS.
 
 ```bash
 # 1. database: PostgreSQL 16 with defaults from .env.example
@@ -50,15 +50,19 @@ docker compose -f infrastructure/docker-compose.yml up -d
 
 # 2. backend: applies migrations on startup (profile `dev` also loads the demo dataset)
 cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+# 3. frontend (another terminal): proxies /api to the backend
+cd frontend && npm ci && npm start
 ```
 
 | URL | What |
 |-----|------|
+| http://localhost:4200 | Web application (Mission Control) |
 | http://localhost:8080/swagger-ui.html | API documentation (OpenAPI) |
 | http://localhost:8080/actuator/health | Health check |
 
-More: [`backend/README.md`](backend/README.md), [`docs/database/README.md`](docs/database/README.md).
-Frontend (#12) instructions are added when it is bootstrapped.
+More: [`backend/README.md`](backend/README.md), [`frontend/README.md`](frontend/README.md),
+[`docs/database/README.md`](docs/database/README.md).
 
 ## How we work
 
