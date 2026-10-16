@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 
-import { FeaturePlaceholder } from '../../shared/ui/feature-placeholder/feature-placeholder';
+import { ColonyListPage } from './pages/colony-list-page';
 
-export const COLONIES_ROUTES: Routes = [
-  { path: '', component: FeaturePlaceholder, data: { domain: 'colonies' } },
-];
+export const COLONIES_ROUTES: Routes = [{ path: '', title: 'Bases', component: ColonyListPage }];
