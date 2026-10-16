@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.net.URI;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
@@ -40,8 +41,9 @@ class MissionController {
 
     @GetMapping("/{code}")
     @Operation(summary = "Get a mission by code")
+    @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: code longer than 60 characters")
     @ApiResponse(responseCode = "404", description = "RESOURCE_NOT_FOUND")
-    MissionResponse get(@PathVariable String code) {
+    MissionResponse get(@PathVariable @Size(max = 60) String code) {
         return MissionResponse.from(service.get(code));
     }
 

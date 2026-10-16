@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.net.URI;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
@@ -41,8 +42,9 @@ class CrewMemberController {
 
     @GetMapping("/{employeeCode}")
     @Operation(summary = "Get a crew member by employee code")
+    @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: employeeCode longer than 40 characters")
     @ApiResponse(responseCode = "404", description = "RESOURCE_NOT_FOUND")
-    CrewMemberResponse get(@PathVariable String employeeCode) {
+    CrewMemberResponse get(@PathVariable @Size(max = 40) String employeeCode) {
         return CrewMemberResponse.from(service.get(employeeCode));
     }
 
