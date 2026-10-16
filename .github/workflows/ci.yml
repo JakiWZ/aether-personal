@@ -6,7 +6,68 @@ on:
   push:
     branches: [ "main" ]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
+  database:
+    name: Database migrations
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: aether
+          POSTGRES_USER: aether
+          POSTGRES_PASSWORD: aether   # throwaway CI-only credential
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U aether -d aether"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      FLYWAY_IMAGE: flyway/flyway:12.4.0
+      FLYWAY_ARGS: -url=jdbc:postgresql://localhost:5432/aether -user=aether -password=aether -schemas=aether
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Apply migrations on an empty database
+        run: |
+          docker run --rm --network host \
+            -v "$PWD/backend/src/main/resources/db/migration:/flyway/sql:ro" \
+            "$FLYWAY_IMAGE" $FLYWAY_ARGS migrate
+
+      - name: Validate checksums and re-run (must be a no-op)
+        run: |
+          for goal in validate migrate; do
+            docker run --rm --network host \
+              -v "$PWD/backend/src/main/resources/db/migration:/flyway/sql:ro" \
+              "$FLYWAY_IMAGE" $FLYWAY_ARGS "$goal"
+          done
+
+      - name: Smoke-check schema and reference data
+        env:
+          PGPASSWORD: aether
+        run: |
+          psql -h localhost -U aether -d aether -v ON_ERROR_STOP=1 <<'SQL'
+          DO $$
+          BEGIN
+            IF (SELECT count(*) FROM information_schema.tables
+                WHERE table_schema = 'aether' AND table_type = 'BASE TABLE') < 60 THEN
+              RAISE EXCEPTION 'unexpected number of tables';
+            END IF;
+            IF (SELECT count(*) FROM aether.app_role) <> 8 THEN
+              RAISE EXCEPTION 'reference roles missing';
+            END IF;
+          END $$;
+          SQL
+
   backend:
     name: Backend
     runs-on: ubuntu-latest
