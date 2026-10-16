@@ -95,13 +95,18 @@ PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture
 
 ## Commands
 
-> Keep this section in sync with the README. Backend → #11, frontend → #12 add theirs.
+> Keep this section in sync with the README. Frontend (#12) adds its commands when bootstrapped.
 
 ```bash
 # Database: PostgreSQL 16 on localhost:5432 (db/user/password: aether)
 docker compose -f infrastructure/docker-compose.yml up -d
 docker compose -f infrastructure/docker-compose.yml --profile tools run --rm migrate   # apply migrations only
 docker compose -f infrastructure/docker-compose.yml down -v                           # reset
+
+# Backend (from backend/): Swagger UI at http://localhost:8080/swagger-ui.html
+./mvnw spring-boot:run
+./mvnw test      # fast tests, no Docker
+./mvnw verify    # + Testcontainers integration tests (*IT), needs Docker
 ```
 
 New migration: `backend/src/main/resources/db/migration/V<next>__<verb>_<object>.sql`.
