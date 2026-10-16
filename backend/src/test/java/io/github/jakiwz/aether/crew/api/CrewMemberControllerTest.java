@@ -6,6 +6,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import io.github.jakiwz.aether.crew.domain.CrewErrorCode;
 import io.github.jakiwz.aether.crew.domain.CrewMember;
@@ -13,14 +14,17 @@ import io.github.jakiwz.aether.crew.domain.CrewMemberService;
 import io.github.jakiwz.aether.crew.domain.CrewStatus;
 import io.github.jakiwz.aether.shared.error.BusinessRuleViolationException;
 import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
+import io.github.jakiwz.aether.shared.security.SecurityConfig;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -29,6 +33,8 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
  * Contract of {@code /api/v1/crew-members} (ARES-103).
  */
 @WebMvcTest(CrewMemberController.class)
+@Import(SecurityConfig.class)
+@WithMockUser(authorities = {"CREW_READ", "CREW_MANAGE"})
 class CrewMemberControllerTest {
 
     private static final String VALID_BODY = """
@@ -125,7 +131,7 @@ class CrewMemberControllerTest {
     }
 
     private MvcTestResult post(String body) {
-        return mvc.post().uri("/api/v1/crew-members")
+        return mvc.post().uri("/api/v1/crew-members").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
                 .exchange();

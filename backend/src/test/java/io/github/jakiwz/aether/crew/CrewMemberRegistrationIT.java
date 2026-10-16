@@ -1,6 +1,7 @@
 package io.github.jakiwz.aether.crew;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -25,6 +27,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("demo")
+@WithMockUser(username = "cmd.ferrari", authorities = {"CREW_READ", "CREW_MANAGE"})
 @Testcontainers
 @Transactional // every registration is rolled back
 class CrewMemberRegistrationIT {
@@ -98,7 +101,7 @@ class CrewMemberRegistrationIT {
     }
 
     private MvcTestResult register(String body) {
-        return mvc.post().uri("/api/v1/crew-members")
+        return mvc.post().uri("/api/v1/crew-members").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
                 .exchange();

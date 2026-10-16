@@ -16,6 +16,10 @@ public final class ErrorCode {
     public static final String METHOD_NOT_ALLOWED = "METHOD_NOT_ALLOWED";
     public static final String UNSUPPORTED_MEDIA_TYPE = "UNSUPPORTED_MEDIA_TYPE";
     public static final String PAYLOAD_TOO_LARGE = "PAYLOAD_TOO_LARGE";
+    public static final String AUTHENTICATION_REQUIRED = "AUTHENTICATION_REQUIRED";
+    public static final String INVALID_CREDENTIALS = "INVALID_CREDENTIALS";
+    public static final String ACCESS_DENIED = "ACCESS_DENIED";
+    public static final String CSRF_TOKEN_INVALID = "CSRF_TOKEN_INVALID";
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";
     public static final String INTERNAL_ERROR = "INTERNAL_ERROR";
 
@@ -26,6 +30,8 @@ public final class ErrorCode {
     public static String forStatus(HttpStatusCode status) {
         return switch (status.value()) {
             case 400 -> MALFORMED_REQUEST;
+            case 401 -> AUTHENTICATION_REQUIRED;
+            case 403 -> ACCESS_DENIED;
             case 404 -> RESOURCE_NOT_FOUND;
             case 405 -> METHOD_NOT_ALLOWED;
             case 413 -> PAYLOAD_TOO_LARGE;

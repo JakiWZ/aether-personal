@@ -25,7 +25,7 @@ the timeline below always reads "now". To reload after editing the script, reset
 |------|---------|
 | Bases | `ARS-01` Ares Prime (OPERATIONAL), `VLM-01` Valles Research Outpost (OPERATIONAL), `ELY-01` Elysium Relay (DEGRADED), `THR-01` Tharsis Forward Base (CONSTRUCTION); 5 habitats, 14 modules, 7 areas |
 | Crew | 19 members `CRW-001`…`CRW-019` across all four bases; statuses ACTIVE, TRAINING, OFF_DUTY, MEDICAL_LEAVE, SUSPENDED, INACTIVE; 10 skills, 5 certifications |
-| Users | 11 accounts covering every role (`admin.neri`, `mc.rossi`, `cmd.ferrari`, `log.marino`, …). They have a placeholder hash and **cannot log in** |
+| Users | 11 accounts covering every role (`admin.neri`, `mc.rossi`, `cmd.ferrari`, `log.marino`, …). All share the demo-only password `Aether-demo-password` (ADR-0012) |
 | Missions | `PHX-001`…`PHX-010` covering all 8 states (DRAFT, PLANNED, APPROVAL_PENDING, APPROVED, IN_PROGRESS, COMPLETED, ABORTED, CANCELLED), with phases, tasks, crew/vehicle assignments, requirements, risks, approvals and status history |
 | Fleet | 13 assets: rovers, drones and a shuttle plus generators, life support and an antenna; statuses AVAILABLE, IN_USE, MAINTENANCE, OUT_OF_SERVICE, DECOMMISSIONED |
 | Logistics | 7 resources, 6 locations, 3 lots, 19 stock rows backed by the movement ledger, thresholds, 4 shipments (PLANNED, IN_TRANSIT, DELAYED, RECEIVED) |

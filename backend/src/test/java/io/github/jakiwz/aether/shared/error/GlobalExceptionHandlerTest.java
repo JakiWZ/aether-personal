@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
  */
 @WebMvcTest(controllers = ProbeController.class)
 @Import(ProbeController.class)
+@AutoConfigureMockMvc(addFilters = false) // error mapping only; security has its own tests
 class GlobalExceptionHandlerTest {
 
     @Autowired

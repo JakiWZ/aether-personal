@@ -9,7 +9,8 @@
 --   stay meaningful whenever the demo database is created.
 -- * Rows reference each other by business code (colony.code, crew_member.employee_code, ...),
 --   never by generated ids.
--- * Accounts carry a placeholder password hash that matches no password: they cannot log in.
+-- * Every demo account shares the documented password `Aether-demo-password` (ADR-0012), set by the
+--   UPDATE after the block so that databases loaded before login existed get it too. Demo only.
 --
 -- Built-in cases for queries and negative tests are listed in docs/database/demo-dataset.md.
 
@@ -820,3 +821,9 @@ BEGIN
     JOIN user_account u ON u.username = v.username;
 END
 $demo$;
+
+-- Demo login (ADR-0012): Argon2id hash of `Aether-demo-password`. Outside the guarded block so that it
+-- also reaches demo databases loaded earlier with the no-login placeholder; it never touches other hashes.
+UPDATE user_account
+SET password_hash = '{argon2id}$argon2id$v=19$m=19456,t=2,p=1$t2iADnYZFJC69cNr65AcxA$h6C1eYJcnHleMu1ApggzcCq61zaNhqTgOD0+U3ea5Jk'
+WHERE password_hash = 'DEMO-ACCOUNT-NO-LOGIN';
