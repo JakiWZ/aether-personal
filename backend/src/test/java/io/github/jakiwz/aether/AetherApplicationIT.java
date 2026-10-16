@@ -51,6 +51,13 @@ class AetherApplicationIT {
     }
 
     @Test
+    void providesTheDisabledSystemAccountEveryEnvironmentWritesWith() {
+        assertThat(jdbc.queryForObject(
+                "SELECT account_status FROM aether.user_account WHERE username = 'system'", String.class))
+                .isEqualTo("DISABLED");
+    }
+
+    @Test
     void healthEndpointReportsUp() {
         assertThat(mvc.get().uri("/actuator/health"))
                 .hasStatusOk()

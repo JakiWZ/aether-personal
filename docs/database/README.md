@@ -48,6 +48,7 @@ Reset everything: `docker compose -f infrastructure/docker-compose.yml down -v`.
 | V12 | Notifications | `notification`, `notification_preference` |
 | V13 | Audit | `audit_event`, `outbox_event` |
 | V14 | Reference data | 8 roles, 22 permissions, role-permission matrix, 14 units of measure |
+| V15 | System account | Disabled `system` account that writes are attributed to until authentication exists (ADR-0008) |
 | R (demo) | Demo dataset | 4 bases, 19 crew, 10 missions in every state, fleet, stock, incidents ([details](demo-dataset.md)) |
 
 ## Business rules enforced by the database
