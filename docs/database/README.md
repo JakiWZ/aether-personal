@@ -9,6 +9,7 @@ and [ADR-0004](../adr/0004-schema-migrations-with-flyway.md)).
 |------|---------|
 | `backend/src/main/resources/db/migration/` | **Source of truth.** Versioned Flyway migrations. |
 | `backend/src/main/resources/db/demo/` | Demo dataset, loaded only for `dev`/`demo` and the local `migrate` service. See [demo-dataset.md](demo-dataset.md). |
+| [`er-model.md`](er-model.md) | **Conceptual E-R model v1**: entities, cardinalities and their rationale, as Mermaid diagrams. |
 | `docs/database/design/` | Conceptual design documents (E-R reasoning, normalisation) and table sketches. |
 | `docs/database/legacy/` | Superseded scripts kept for reference. Do not use them to build a database. |
 
