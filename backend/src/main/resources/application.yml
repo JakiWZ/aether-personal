@@ -1,0 +1,44 @@
+# Configuration is externalised through environment variables (NFR-008, INT-605).
+# Defaults target the local Docker Compose database and are not secrets.
+spring:
+  application:
+    name: aether-backend
+  datasource:
+    url: jdbc:postgresql://${AETHER_DB_HOST:localhost}:${AETHER_DB_PORT:5432}/${AETHER_DB_NAME:aether}
+    username: ${AETHER_DB_USER:aether}
+    password: ${AETHER_DB_PASSWORD:aether}
+  flyway:
+    schemas: aether
+    default-schema: aether
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate      # the schema is owned by Flyway (ADR-0004)
+    properties:
+      hibernate:
+        default_schema: aether
+        jdbc:
+          time_zone: UTC      # BR-011: persist instants in UTC
+  jackson:
+    time-zone: UTC
+
+server:
+  error:
+    include-stacktrace: never
+    include-message: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
