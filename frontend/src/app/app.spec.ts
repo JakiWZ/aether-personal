@@ -11,6 +11,9 @@ import { AetherTitleStrategy } from './core/navigation/aether-title-strategy';
 import { DOMAINS } from './core/navigation/domains';
 import { TEST_CONFIG, provideTestConfig } from './testing/test-config';
 
+/** Domains whose landing route is a real screen instead of the placeholder named after the domain. */
+const LANDING_PAGES: Partial<Record<string, string>> = { colonies: 'Bases' };
+
 describe('App routing', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -31,13 +34,13 @@ describe('App routing', () => {
     expect(TestBed.inject(Title).getTitle()).toBe('Mission Control · AETHER');
   });
 
-  it.each(DOMAINS.map((d) => [d.path, d.label]))(
+  it.each(DOMAINS.map((d) => [d.path, LANDING_PAGES[d.path] ?? d.label]))(
     'lazy-loads the %s feature',
-    async (path, label) => {
+    async (path, heading) => {
       const harness = await RouterTestingHarness.create(`/${path}`);
 
-      expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe(label);
-      expect(TestBed.inject(Title).getTitle()).toBe(`${label} · AETHER`);
+      expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe(heading);
+      expect(TestBed.inject(Title).getTitle()).toBe(`${heading} · AETHER`);
     },
   );
 
