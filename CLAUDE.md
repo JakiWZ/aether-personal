@@ -24,7 +24,6 @@ atomic transfers, auditable state changes) must hold **server-side**, never only
 | `docs/adr/` | Architecture Decision Records (MADR). **Every significant technical decision gets one.** |
 | `docs/agile/` | Definition of Ready/Done, ceremonies, Git workflow. |
 | `docs/database/` | Data model documentation and legacy SQL. |
-| `BASI DI DATI/` | Raw course material imported from Drive. Reference only — never edit, never link from code. |
 
 ## Source of truth for work
 
