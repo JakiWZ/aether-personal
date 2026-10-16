@@ -13,7 +13,7 @@ spring:
   flyway:
     schemas: aether
     default-schema: aether
-    # The demo dataset is a repeatable migration seen only with the `demo` profile (ADR-0006).
+    # The demo dataset is a repeatable migration seen only with the `demo` profile (ADR-0007).
     # Tolerate it in the history when the backend runs without that profile on a demo database.
     ignore-migration-patterns: "*:future,repeatable:missing"
   jpa:

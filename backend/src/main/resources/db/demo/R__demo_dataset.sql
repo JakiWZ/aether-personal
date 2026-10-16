@@ -1,7 +1,7 @@
 -- Demo dataset (TASK-004, issue #10): coherent sample data to develop and demonstrate AETHER.
 --
 -- Loaded only when Flyway also scans `db/demo` (Spring profiles `dev`/`demo`, the local Docker
--- Compose `migrate` service); never in tests or real environments. See ADR-0006.
+-- Compose `migrate` service); never in tests or real environments. See ADR-0007.
 --
 -- * Runs once per database: if the demo colonies already exist the whole block is skipped,
 --   so a re-run never duplicates rows. To reload after editing this file, reset the database.

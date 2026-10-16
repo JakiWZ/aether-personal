@@ -2,7 +2,7 @@
 
 Coherent sample data to develop and demonstrate AETHER (TASK-004, issue #10). Source:
 [`backend/src/main/resources/db/demo/R__demo_dataset.sql`](../../backend/src/main/resources/db/demo/R__demo_dataset.sql).
-How it is loaded and why: [ADR-0006](../adr/0006-demo-dataset-as-repeatable-migration.md).
+How it is loaded and why: [ADR-0007](../adr/0007-demo-dataset-as-repeatable-migration.md).
 
 ## Load it
 

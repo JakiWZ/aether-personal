@@ -1,4 +1,4 @@
-# ADR-0006: Demo dataset as a profile-scoped repeatable migration
+# ADR-0007: Demo dataset as a profile-scoped repeatable migration
 
 - **Status:** Accepted
 - **Date:** 2026-10-16

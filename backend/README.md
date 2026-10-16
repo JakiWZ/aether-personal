@@ -16,7 +16,7 @@ cd backend
 ```
 
 Profile `dev` (or `demo`) also loads the demo dataset from `db/demo`
-([details](../docs/database/demo-dataset.md), [ADR-0006](../docs/adr/0006-demo-dataset-as-repeatable-migration.md)).
+([details](../docs/database/demo-dataset.md), [ADR-0007](../docs/adr/0007-demo-dataset-as-repeatable-migration.md)).
 
 | URL | What |
 |-----|------|
