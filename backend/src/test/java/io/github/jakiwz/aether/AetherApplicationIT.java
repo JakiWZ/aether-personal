@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.testcontainers.junit.jupiter.Container;
@@ -34,10 +35,19 @@ class AetherApplicationIT {
     @Autowired
     Flyway flyway;
 
+    @Autowired
+    JdbcTemplate jdbc;
+
     @Test
     void appliesAllMigrationsOnAnEmptyDatabase() {
         assertThat(flyway.info().pending()).isEmpty();
         assertThat(flyway.info().applied()).hasSizeGreaterThanOrEqualTo(14);
+    }
+
+    @Test
+    void loadsNoDemoDataWithoutTheDemoProfile() {
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM aether.colony", Long.class)).isZero();
+        assertThat(jdbc.queryForObject("SELECT count(*) FROM aether.app_role", Long.class)).isEqualTo(8);
     }
 
     @Test
