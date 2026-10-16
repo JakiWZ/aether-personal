@@ -1,0 +1,27 @@
+name: User Story
+description: Funzionalità con valore per un utente/stakeholder
+title: "[STORY] "
+labels: ["type:story"]
+body:
+  - type: textarea
+    id: story
+    attributes:
+      label: User Story
+      description: "Come <ruolo> voglio <obiettivo> affinché <valore>."
+    validations:
+      required: true
+  - type: textarea
+    id: criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Inserire criteri verificabili.
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dipendenze / note

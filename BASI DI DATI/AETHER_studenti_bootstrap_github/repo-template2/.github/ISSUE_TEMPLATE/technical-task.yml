@@ -1,0 +1,25 @@
+name: Technical Task
+description: Attività tecnica necessaria al prodotto
+title: "[TASK] "
+labels: ["type:task"]
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Obiettivo tecnico
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Condizioni di completamento
+      value: |
+        - [ ]
+        - [ ]
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: parent
+    attributes:
+      label: Story / Epic collegata

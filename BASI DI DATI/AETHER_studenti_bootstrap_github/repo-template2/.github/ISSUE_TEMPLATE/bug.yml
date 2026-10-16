@@ -1,0 +1,34 @@
+name: Bug
+description: Segnalazione di comportamento errato
+title: "[BUG] "
+labels: ["type:bug"]
+body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Comportamento osservato
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Comportamento atteso
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Passi per riprodurre
+    validations:
+      required: true
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severità
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true

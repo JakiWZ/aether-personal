@@ -1,0 +1,22 @@
+name: Change Request
+description: Nuova richiesta o variazione di requisito
+title: "[CR] "
+labels: ["type:change-request"]
+body:
+  - type: textarea
+    id: request
+    attributes:
+      label: Richiesta dello stakeholder
+    validations:
+      required: true
+  - type: textarea
+    id: reason
+    attributes:
+      label: Motivo / valore
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impatto da analizzare
+      description: Dati, API, frontend, test, dipendenze, stima.

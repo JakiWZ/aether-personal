@@ -1,0 +1,83 @@
+name: AETHER CI
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
+jobs:
+  backend:
+    name: Backend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect backend
+        id: backend
+        shell: bash
+        run: |
+          if [ -f backend/pom.xml ] || [ -f backend/mvnw ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-java@v4
+        if: steps.backend.outputs.exists == 'true'
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Build/test backend
+        if: steps.backend.outputs.exists == 'true'
+        shell: bash
+        run: |
+          if [ -f backend/mvnw ]; then
+            chmod +x backend/mvnw
+            cd backend
+            ./mvnw -B test
+          else
+            mvn -B -f backend/pom.xml test
+          fi
+
+      - name: Backend not initialized
+        if: steps.backend.outputs.exists != 'true'
+        run: echo "Backend non ancora inizializzato - nessun controllo da eseguire."
+
+  frontend:
+    name: Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Detect frontend
+        id: frontend
+        shell: bash
+        run: |
+          if [ -f frontend/package.json ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/setup-node@v4
+        if: steps.frontend.outputs.exists == 'true'
+        with:
+          node-version: "22"
+
+      - name: Install and build frontend
+        if: steps.frontend.outputs.exists == 'true'
+        shell: bash
+        run: |
+          cd frontend
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+          npm run build --if-present
+
+      - name: Frontend not initialized
+        if: steps.frontend.outputs.exists != 'true'
+        run: echo "Frontend non ancora inizializzato - nessun controllo da eseguire."
