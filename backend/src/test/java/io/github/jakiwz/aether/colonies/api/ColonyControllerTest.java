@@ -1,4 +1,4 @@
-package io.github.jakiwz.aether.colonies;
+package io.github.jakiwz.aether.colonies.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
 /**
  * Contract of {@code GET /api/v1/colonies} (ARES-101).
  */
-@WebMvcTest
+@WebMvcTest(ColonyController.class)
 class ColonyControllerTest {
 
     @Autowired

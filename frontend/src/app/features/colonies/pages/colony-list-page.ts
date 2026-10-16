@@ -40,7 +40,7 @@ const STATUS_LABELS: Record<ColonyStatus, string> = {
   selector: 'app-colony-list-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './colony-list-page.html',
-  styleUrl: './colony-list-page.scss',
+  styleUrls: ['../shared/data-view.scss', './colony-list-page.scss'],
 })
 export class ColonyListPage {
   private readonly colonies = inject(ColonyService);
