@@ -30,7 +30,7 @@ services:
   # including the demo dataset (db/demo, ADR-0007): the local database is a dev database.
   # The backend also runs them on startup; this is handy for DB-only work.
   migrate:
-    image: flyway/flyway:12.4.0
+    image: flyway/flyway:12.11.0
     profiles: ["tools"]
     depends_on:
       postgres:
