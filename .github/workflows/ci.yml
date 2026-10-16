@@ -65,6 +65,38 @@ jobs:
             IF (SELECT count(*) FROM aether.app_role) <> 8 THEN
               RAISE EXCEPTION 'reference roles missing';
             END IF;
+            IF EXISTS (SELECT 1 FROM aether.colony) THEN
+              RAISE EXCEPTION 'demo data loaded without the demo location';
+            END IF;
+          END $$;
+          SQL
+
+      # Demo dataset (TASK-004): applied on top of the schema twice, the second run must be a no-op.
+      - name: Load the demo dataset
+        run: |
+          for run in 1 2; do
+            docker run --rm --network host \
+              -v "$PWD/backend/src/main/resources/db/migration:/flyway/sql:ro" \
+              -v "$PWD/backend/src/main/resources/db/demo:/flyway/demo:ro" \
+              "$FLYWAY_IMAGE" $FLYWAY_ARGS -locations=filesystem:/flyway/sql,filesystem:/flyway/demo migrate
+          done
+
+      - name: Smoke-check the demo dataset
+        env:
+          PGPASSWORD: aether
+        run: |
+          psql -h localhost -U aether -d aether -v ON_ERROR_STOP=1 <<'SQL'
+          DO $$
+          BEGIN
+            IF (SELECT count(*) FROM aether.colony) < 3 THEN
+              RAISE EXCEPTION 'demo: fewer than 3 bases';
+            END IF;
+            IF (SELECT count(*) FROM aether.crew_member) < 15 THEN
+              RAISE EXCEPTION 'demo: fewer than 15 crew members';
+            END IF;
+            IF (SELECT count(DISTINCT status) FROM aether.mission) < 8 THEN
+              RAISE EXCEPTION 'demo: missions do not cover every lifecycle state';
+            END IF;
           END $$;
           SQL
 

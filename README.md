@@ -48,8 +48,8 @@ Prerequisites: Docker, Java 21, Node.js 24 LTS.
 # 1. database: PostgreSQL 16 with defaults from .env.example
 docker compose -f infrastructure/docker-compose.yml up -d
 
-# 2. backend: applies migrations on startup
-cd backend && ./mvnw spring-boot:run
+# 2. backend: applies migrations on startup (profile `dev` also loads the demo dataset)
+cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 
 # 3. frontend (another terminal): proxies /api to the backend
 cd frontend && npm ci && npm start

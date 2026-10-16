@@ -99,11 +99,12 @@ PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture
 ```bash
 # Database: PostgreSQL 16 on localhost:5432 (db/user/password: aether)
 docker compose -f infrastructure/docker-compose.yml up -d
-docker compose -f infrastructure/docker-compose.yml --profile tools run --rm migrate   # apply migrations only
+docker compose -f infrastructure/docker-compose.yml --profile tools run --rm migrate   # apply migrations + demo data
 docker compose -f infrastructure/docker-compose.yml down -v                           # reset
 
 # Backend (from backend/): Swagger UI at http://localhost:8080/swagger-ui.html
 ./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev   # + demo dataset (docs/database/demo-dataset.md)
 ./mvnw test      # fast tests, no Docker
 ./mvnw verify    # + Testcontainers integration tests (*IT), needs Docker
 
