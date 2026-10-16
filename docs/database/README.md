@@ -8,6 +8,7 @@ and [ADR-0004](../adr/0004-schema-migrations-with-flyway.md)).
 | Path | Content |
 |------|---------|
 | `backend/src/main/resources/db/migration/` | **Source of truth.** Versioned Flyway migrations. |
+| `backend/src/main/resources/db/demo/` | Demo dataset, loaded only for `dev`/`demo` and the local `migrate` service. See [demo-dataset.md](demo-dataset.md). |
 | `docs/database/design/` | Conceptual design documents (E-R reasoning, normalisation) and table sketches. |
 | `docs/database/legacy/` | Superseded scripts kept for reference. Do not use them to build a database. |
 
@@ -17,7 +18,7 @@ and [ADR-0004](../adr/0004-schema-migrations-with-flyway.md)).
 # start PostgreSQL 16 (defaults: db/user/password = aether, port 5432)
 docker compose -f infrastructure/docker-compose.yml up -d
 
-# apply migrations without starting the backend
+# apply migrations and the demo dataset without starting the backend
 docker compose -f infrastructure/docker-compose.yml --profile tools run --rm migrate
 
 # connect
@@ -44,6 +45,7 @@ Reset everything: `docker compose -f infrastructure/docker-compose.yml down -v`.
 | V12 | Notifications | `notification`, `notification_preference` |
 | V13 | Audit | `audit_event`, `outbox_event` |
 | V14 | Reference data | 8 roles, 22 permissions, role-permission matrix, 14 units of measure |
+| R (demo) | Demo dataset | 4 bases, 19 crew, 10 missions in every state, fleet, stock, incidents ([details](demo-dataset.md)) |
 
 ## Business rules enforced by the database
 

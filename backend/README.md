@@ -12,7 +12,11 @@ docker compose -f infrastructure/docker-compose.yml up -d
 # 2. backend (Flyway migrates the schema on startup)
 cd backend
 ./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev   # same, plus the demo dataset
 ```
+
+Profile `dev` (or `demo`) also loads the demo dataset from `db/demo`
+([details](../docs/database/demo-dataset.md), [ADR-0006](../docs/adr/0006-demo-dataset-as-repeatable-migration.md)).
 
 | URL | What |
 |-----|------|
