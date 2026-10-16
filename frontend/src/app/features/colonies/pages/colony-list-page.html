@@ -49,10 +49,12 @@
             <td class="code">{{ c.code }}</td>
             <td>{{ c.name }}</td>
             <td>
-              <span class="status" [attr.data-status]="c.status">{{ statusLabels[c.status] }}</span>
+              <span class="badge status" [attr.data-status]="c.status">{{
+                statusLabels[c.status]
+              }}</span>
             </td>
             <td>
-              <span class="activity" [attr.data-active]="c.active">{{
+              <span class="badge activity" [attr.data-active]="c.active">{{
                 c.active ? 'Active' : 'Inactive'
               }}</span>
             </td>

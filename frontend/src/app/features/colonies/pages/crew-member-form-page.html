@@ -1,0 +1,110 @@
+<h1>New crew member</h1>
+<p class="intro">
+  Fields marked * are required. The code and the email must not be in use already.
+</p>
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (formError(); as e) {
+    <div class="message error" role="alert">
+      <p>The crew member could not be registered. {{ e.message }}</p>
+    </div>
+  }
+
+  <ng-template #fieldError let-name>
+    @if (showErrors(name)) {
+      <p class="field-error" [id]="name + '-error'">{{ errorMessage(name) }}</p>
+    }
+  </ng-template>
+
+  <div class="field">
+    <label for="employeeCode">Employee code *</label>
+    <input
+      id="employeeCode"
+      formControlName="employeeCode"
+      autocomplete="off"
+      [attr.aria-invalid]="showErrors('employeeCode')"
+      [attr.aria-describedby]="showErrors('employeeCode') ? 'employeeCode-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'employeeCode' }" />
+  </div>
+
+  <div class="field">
+    <label for="firstName">First name *</label>
+    <input
+      id="firstName"
+      formControlName="firstName"
+      autocomplete="given-name"
+      [attr.aria-invalid]="showErrors('firstName')"
+      [attr.aria-describedby]="showErrors('firstName') ? 'firstName-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'firstName' }" />
+  </div>
+
+  <div class="field">
+    <label for="lastName">Last name *</label>
+    <input
+      id="lastName"
+      formControlName="lastName"
+      autocomplete="family-name"
+      [attr.aria-invalid]="showErrors('lastName')"
+      [attr.aria-describedby]="showErrors('lastName') ? 'lastName-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'lastName' }" />
+  </div>
+
+  <div class="field">
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      formControlName="email"
+      autocomplete="email"
+      [attr.aria-invalid]="showErrors('email')"
+      [attr.aria-describedby]="showErrors('email') ? 'email-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'email' }" />
+  </div>
+
+  <div class="field">
+    <label for="operationalRole">Operational role *</label>
+    <input
+      id="operationalRole"
+      formControlName="operationalRole"
+      [attr.aria-invalid]="showErrors('operationalRole')"
+      [attr.aria-describedby]="showErrors('operationalRole') ? 'operationalRole-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'operationalRole' }" />
+  </div>
+
+  <div class="field">
+    <label for="status">Status *</label>
+    <select id="status" formControlName="status">
+      @for (s of statuses; track s) {
+        <option [value]="s">{{ statusLabels[s] }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label for="homeColonyCode">Home base</label>
+    <select
+      id="homeColonyCode"
+      formControlName="homeColonyCode"
+      [attr.aria-invalid]="showErrors('homeColonyCode')"
+      [attr.aria-describedby]="showErrors('homeColonyCode') ? 'homeColonyCode-error' : null"
+    >
+      <option value="">Not assigned</option>
+      @for (c of colonies(); track c.code) {
+        <option [value]="c.code">{{ c.code }} · {{ c.name }}</option>
+      }
+    </select>
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'homeColonyCode' }" />
+  </div>
+
+  <div class="actions">
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Registering…' : 'Register crew member' }}
+    </button>
+    <a routerLink="..">Cancel</a>
+  </div>
+</form>
