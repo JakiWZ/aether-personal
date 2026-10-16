@@ -34,8 +34,8 @@ export const ClientErrorCode = {
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const;
 
-const NETWORK_MESSAGE = 'Impossibile contattare il server. Verifica la connessione e riprova.';
-const GENERIC_MESSAGE = 'Si è verificato un errore imprevisto. Riprova più tardi.';
+const NETWORK_MESSAGE = 'Cannot reach the server. Check your connection and try again.';
+const GENERIC_MESSAGE = 'An unexpected error occurred. Please try again later.';
 
 export function isProblemDetail(body: unknown): body is ProblemDetail {
   if (typeof body !== 'object' || body === null) {

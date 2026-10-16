@@ -9,7 +9,7 @@ describe('FeaturePlaceholder', () => {
     await fixture.whenStable();
 
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.querySelector('h1')?.textContent).toBe('Missioni');
+    expect(el.querySelector('h1')?.textContent).toBe('Missions');
     expect(el.textContent).toContain('Squad PHOENIX');
   });
 

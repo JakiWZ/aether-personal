@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { BackendHealth, BackendHealthService } from '../../core/health/backend-health.service';
@@ -6,10 +13,10 @@ import { BackendHealth, BackendHealthService } from '../../core/health/backend-h
 type StatusState = 'loading' | BackendHealth;
 
 const LABELS: Record<StatusState, string> = {
-  loading: 'Verifica backend…',
-  up: 'Backend operativo',
-  down: 'Backend non operativo',
-  unreachable: 'Backend non raggiungibile',
+  loading: 'Checking backend…',
+  up: 'Backend online',
+  down: 'Backend unhealthy',
+  unreachable: 'Backend unreachable',
 };
 
 /** Small indicator of backend availability, shown in the header. */
@@ -21,7 +28,7 @@ const LABELS: Record<StatusState, string> = {
       <span class="dot" aria-hidden="true"></span>{{ label() }}
     </span>
     @if (state() === 'down' || state() === 'unreachable') {
-      <button type="button" (click)="refresh()">Riprova</button>
+      <button type="button" (click)="refresh()">Retry</button>
     }
   `,
   styles: `
@@ -53,7 +60,7 @@ export class BackendStatus {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly state = signal<StatusState>('loading');
-  protected readonly label = () => LABELS[this.state()];
+  protected readonly label = computed(() => LABELS[this.state()]);
 
   constructor() {
     this.refresh();

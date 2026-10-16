@@ -22,12 +22,12 @@ describe('BackendStatus', () => {
     const fixture = TestBed.createComponent(BackendStatus);
     await fixture.whenStable();
     const el = fixture.nativeElement as HTMLElement;
-    expect(el.textContent).toContain('Verifica backend');
+    expect(el.textContent).toContain('Checking backend');
 
     http.expectOne(TEST_CONFIG.healthUrl).flush({ status: 'UP' });
     await fixture.whenStable();
 
-    expect(el.querySelector('[role="status"]')?.textContent).toContain('Backend operativo');
+    expect(el.querySelector('[role="status"]')?.textContent).toContain('Backend online');
     expect(el.querySelector('button')).toBeNull();
   });
 
@@ -37,12 +37,12 @@ describe('BackendStatus', () => {
 
     http.expectOne(TEST_CONFIG.healthUrl).error(new ProgressEvent('error'));
     await fixture.whenStable();
-    expect(el.textContent).toContain('Backend non raggiungibile');
+    expect(el.textContent).toContain('Backend unreachable');
 
     el.querySelector('button')!.click();
     http.expectOne(TEST_CONFIG.healthUrl).flush({ status: 'UP' });
     await fixture.whenStable();
 
-    expect(el.textContent).toContain('Backend operativo');
+    expect(el.textContent).toContain('Backend online');
   });
 });

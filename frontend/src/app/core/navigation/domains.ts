@@ -9,32 +9,41 @@ export interface DomainLink {
 export const DOMAINS: readonly DomainLink[] = [
   {
     path: 'colonies',
-    label: 'Colonie ed equipaggio',
+    label: 'Colonies & Crew',
     squad: 'ARES',
-    summary: 'Basi, habitat, membri dell’equipaggio, competenze e certificazioni.',
+    summary: 'Bases, habitats, crew members, skills and certifications.',
   },
   {
     path: 'missions',
-    label: 'Missioni',
+    label: 'Missions',
     squad: 'PHOENIX',
-    summary: 'Pianificazione delle missioni, assegnazione dell’equipaggio e ciclo di vita.',
+    summary: 'Mission planning, crew assignment and lifecycle.',
   },
   {
     path: 'fleet',
-    label: 'Flotta e manutenzione',
+    label: 'Fleet & Maintenance',
     squad: 'TITAN',
-    summary: 'Rover e veicoli, disponibilità e interventi di manutenzione.',
+    summary: 'Rovers and vehicles, availability and maintenance work.',
   },
   {
     path: 'inventory',
-    label: 'Risorse e logistica',
+    label: 'Resources & Logistics',
     squad: 'ORION',
-    summary: 'Scorte, movimenti di magazzino, soglie e trasferimenti tra basi.',
+    summary: 'Stock levels, movements, thresholds and transfers between bases.',
   },
   {
     path: 'incidents',
-    label: 'Incidenti e sicurezza',
+    label: 'Incidents & Safety',
     squad: 'HELIOS',
-    summary: 'Segnalazione e gestione degli incidenti, soccorritori e timeline.',
+    summary: 'Incident reporting and handling, responders and timeline.',
   },
 ];
+
+/** Looks up a domain by path; throws on a typo so a broken route fails fast in tests. */
+export function domainByPath(path: string): DomainLink {
+  const domain = DOMAINS.find((d) => d.path === path);
+  if (!domain) {
+    throw new Error(`Unknown domain: ${path}`);
+  }
+  return domain;
+}

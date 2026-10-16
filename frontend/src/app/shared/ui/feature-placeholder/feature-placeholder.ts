@@ -14,7 +14,7 @@ import { DOMAINS } from '../../../core/navigation/domains';
       <h1>{{ d.label }}</h1>
       <p class="squad">Squad {{ d.squad }}</p>
       <p>{{ d.summary }}</p>
-      <p class="note">Le funzionalità di questa area saranno disponibili nei prossimi sprint.</p>
+      <p class="note">The features of this area will be delivered in upcoming sprints.</p>
     }
   `,
   styles: `

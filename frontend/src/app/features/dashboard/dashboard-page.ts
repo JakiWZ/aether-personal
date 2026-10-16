@@ -10,7 +10,7 @@ import { DOMAINS } from '../../core/navigation/domains';
   imports: [RouterLink],
   template: `
     <h1>Mission Control</h1>
-    <p>Panoramica operativa delle colonie marziane.</p>
+    <p>Operational overview of the Martian colonies.</p>
     <ul class="domains">
       @for (d of domains; track d.path) {
         <li>

@@ -44,7 +44,7 @@ describe('App routing', () => {
   it('shows a not-found page for unknown URLs', async () => {
     const harness = await RouterTestingHarness.create('/does-not-exist');
 
-    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('Pagina non trovata');
+    expect(harness.routeNativeElement?.querySelector('h1')?.textContent).toBe('Page not found');
   });
 
   it('renders the shell with a link per domain and the backend status', async () => {
@@ -57,6 +57,6 @@ describe('App routing', () => {
     const links = Array.from(el.querySelectorAll('nav a')).map((a) => a.getAttribute('href'));
     expect(links).toEqual(['/dashboard', ...DOMAINS.map((d) => `/${d.path}`)]);
     expect(el.querySelector('a.skip-link')?.getAttribute('href')).toBe('#main-content');
-    expect(el.textContent).toContain('Backend operativo');
+    expect(el.textContent).toContain('Backend online');
   });
 });

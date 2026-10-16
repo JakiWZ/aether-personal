@@ -26,8 +26,8 @@ error states, RFC 9457 errors, accessibility) easy to follow.
 - **Errors**: `toApiError()` turns any `HttpErrorResponse` into one `ApiError` shape. Problem
   Details bodies keep their stable `code` and `errors[]`; network failures and non-JSON bodies get
   client codes (`NETWORK_ERROR`, `UNEXPECTED_RESPONSE`) and a generic message, never raw HTML.
-- **UI language**: Italian (`lang="it"`, `LOCALE_ID it-IT`), the language of the client's
-  operators. Texts stay in templates for now; extracting them with `@angular/localize` (NFR-011)
+- **UI language**: English (`lang="en"`, default `en-US` locale), consistent with code and API
+  messages. Texts stay in templates for now; extracting them with `@angular/localize` (NFR-011)
   is deferred until there is a second language to ship.
 - **Accessibility** (NFR-010): skip link, labelled navigation with `aria-current`, page titles per
   route, visible focus, `angular-eslint` template accessibility rules in CI.

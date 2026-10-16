@@ -6,9 +6,9 @@ import { RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
   template: `
-    <h1>Pagina non trovata</h1>
-    <p>L’indirizzo richiesto non esiste.</p>
-    <a routerLink="/dashboard">Torna a Mission Control</a>
+    <h1>Page not found</h1>
+    <p>The requested address does not exist.</p>
+    <a routerLink="/dashboard">Back to Mission Control</a>
   `,
 })
 export class NotFoundPage {}

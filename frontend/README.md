@@ -15,7 +15,7 @@ npm start          # http://localhost:4200
 
 `npm start` forwards `/api` and `/actuator` to the backend on `http://localhost:8080`
 (`proxy.conf.json`), so start the backend first (see [`backend/README.md`](../backend/README.md)).
-Without it the app still runs and the header shows "Backend non raggiungibile".
+Without it the app still runs and the header shows "Backend unreachable".
 
 ## Scripts
 
