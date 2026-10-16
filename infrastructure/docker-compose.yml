@@ -29,7 +29,7 @@ services:
   # One-shot container that applies the Flyway migrations to the local database.
   # The backend also runs them on startup; this is handy for DB-only work.
   migrate:
-    image: flyway/flyway:12.4.0
+    image: flyway/flyway:13.10.0
     profiles: ["tools"]
     depends_on:
       postgres:
