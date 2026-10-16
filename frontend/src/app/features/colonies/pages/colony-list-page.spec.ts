@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TEST_CONFIG, provideTestConfig } from '../../../testing/test-config';
+import { TEST_CONFIG, pageOf, provideTestConfig } from '../../../testing/test-config';
 import { Colony } from '../data/colony.service';
 import { ColonyListPage } from './colony-list-page';
 
@@ -43,7 +43,7 @@ describe('ColonyListPage', () => {
   const rows = () => Array.from(el().querySelectorAll('tbody tr'));
 
   async function respond(body: Colony[]): Promise<void> {
-    http.expectOne((r) => r.url === URL).flush(body);
+    http.expectOne((r) => r.url === URL).flush(pageOf(body));
     await fixture.whenStable();
   }
 
@@ -82,7 +82,7 @@ describe('ColonyListPage', () => {
 
     const req = http.expectOne((r) => r.url === URL);
     expect(req.request.params.get('active')).toBe('false');
-    req.flush([]);
+    req.flush(pageOf([]));
     await fixture.whenStable();
 
     expect(el().querySelector('[role="status"]')?.textContent).toContain('No inactive bases');
@@ -90,7 +90,7 @@ describe('ColonyListPage', () => {
 
   it('shows the server error and retries on demand', async () => {
     http
-      .expectOne(URL)
+      .expectOne((r) => r.url === URL)
       .flush(
         { status: 503, code: 'SERVICE_UNAVAILABLE', detail: 'Database offline.' },
         { status: 503, statusText: 'Service Unavailable' },

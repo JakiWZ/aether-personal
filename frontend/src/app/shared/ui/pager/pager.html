@@ -1,0 +1,12 @@
+<nav class="pager" aria-label="Pagination">
+  <p class="summary" aria-live="polite">
+    {{ page().totalItems }} {{ noun() }}
+    @if (page().totalPages > 1) {
+      · page {{ page().page + 1 }} of {{ page().totalPages }}
+    }
+  </p>
+  @if (page().totalPages > 1) {
+    <button type="button" [disabled]="!hasPrevious()" (click)="previous()">Previous</button>
+    <button type="button" [disabled]="!hasNext()" (click)="next()">Next</button>
+  }
+</nav>

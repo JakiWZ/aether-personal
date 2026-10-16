@@ -15,9 +15,11 @@ import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
 import java.util.Locale;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +47,10 @@ public class MissionService {
         this.actor = actor;
     }
 
-    public List<Mission> list() {
-        return missions.findAllByOrderByPlannedStartAtAscCodeAsc().stream().map(MissionService::toDomain).toList();
+    /** Missions ordered by planned start, then code. */
+    public Page<Mission> list(int page, int size) {
+        return missions.findAllBy(PageRequest.of(page, size, Sort.by("plannedStartAt", "code")))
+                .map(MissionService::toDomain);
     }
 
     public Mission get(String code) {

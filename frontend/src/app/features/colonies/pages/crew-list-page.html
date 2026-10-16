@@ -14,8 +14,8 @@
     <p>The crew could not be loaded. {{ e.message }}</p>
     <button type="button" (click)="load()">Retry</button>
   </div>
-} @else if (members(); as list) {
-  @if (list.length === 0) {
+} @else if (memberPage(); as p) {
+  @if (p.totalItems === 0) {
     <p class="message" role="status">No crew members registered yet.</p>
   } @else {
     <table>
@@ -32,7 +32,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (m of list; track m.employeeCode) {
+        @for (m of p.items; track m.employeeCode) {
           <tr [class.highlight]="m.employeeCode === created()">
             <td class="code">{{ m.employeeCode }}</td>
             <td>{{ m.firstName }} {{ m.lastName }}</td>
@@ -45,6 +45,12 @@
         }
       </tbody>
     </table>
+    <app-pager
+      [page]="p"
+      singular="crew member"
+      plural="crew members"
+      (pageChange)="load($event)"
+    />
   }
 } @else {
   <p class="message" role="status">Loading crew…</p>

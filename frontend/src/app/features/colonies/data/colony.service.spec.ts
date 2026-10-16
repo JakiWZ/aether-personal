@@ -2,7 +2,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 
-import { TEST_CONFIG, provideTestConfig } from '../../../testing/test-config';
+import { TEST_CONFIG, pageOf, provideTestConfig } from '../../../testing/test-config';
 import { Colony, ColonyService } from './colony.service';
 
 describe('ColonyService', () => {
@@ -19,23 +19,27 @@ describe('ColonyService', () => {
 
   afterEach(() => http.verify());
 
-  it('gets every base from the configured API URL', () => {
+  it('gets the first page of bases from the configured API URL', () => {
     const colonies: Colony[] = [];
-    service.list().subscribe((list) => colonies.push(...list));
+    service.list().subscribe((page) => colonies.push(...page.items));
 
-    const req = http.expectOne(`${TEST_CONFIG.apiBaseUrl}/colonies`);
+    const req = http.expectOne((r) => r.url === `${TEST_CONFIG.apiBaseUrl}/colonies`);
     expect(req.request.method).toBe('GET');
     expect(req.request.params.has('active')).toBe(false);
-    req.flush([
-      {
-        code: 'ARS-01',
-        name: 'Ares Prime',
-        status: 'OPERATIONAL',
-        active: true,
-        maxPopulation: 40,
-        establishedAt: '2031-03-14',
-      },
-    ]);
+    expect(req.request.params.get('page')).toBe('0');
+    expect(req.request.params.get('size')).toBe('20');
+    req.flush(
+      pageOf([
+        {
+          code: 'ARS-01',
+          name: 'Ares Prime',
+          status: 'OPERATIONAL',
+          active: true,
+          maxPopulation: 40,
+          establishedAt: '2031-03-14',
+        },
+      ]),
+    );
 
     expect(colonies.map((c) => c.code)).toEqual(['ARS-01']);
   });
@@ -45,6 +49,6 @@ describe('ColonyService', () => {
 
     const req = http.expectOne((r) => r.url === `${TEST_CONFIG.apiBaseUrl}/colonies`);
     expect(req.request.params.get('active')).toBe('false');
-    req.flush([]);
+    req.flush(pageOf([]));
   });
 });

@@ -1,14 +1,15 @@
 package io.github.jakiwz.aether.colonies.persistence;
 
-import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ColonyRepository extends JpaRepository<ColonyEntity, Long> {
 
-    List<ColonyEntity> findByDeletedAtIsNullOrderByCodeAsc();
+    Page<ColonyEntity> findByDeletedAtIsNull(Pageable pageable);
 
-    List<ColonyEntity> findByDeletedAtIsNullAndActiveOrderByCodeAsc(boolean active);
+    Page<ColonyEntity> findByDeletedAtIsNullAndActive(boolean active, Pageable pageable);
 
     Optional<ColonyEntity> findByCodeAndDeletedAtIsNull(String code);
 }

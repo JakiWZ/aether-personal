@@ -8,9 +8,11 @@ import io.github.jakiwz.aether.crew.persistence.PersonEntity;
 import io.github.jakiwz.aether.crew.persistence.PersonRepository;
 import io.github.jakiwz.aether.shared.error.BusinessRuleViolationException;
 import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
-import java.util.List;
 import java.util.Locale;
 import org.jspecify.annotations.Nullable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +34,10 @@ public class CrewMemberService {
         this.colonies = colonies;
     }
 
-    public List<CrewMember> list() {
-        return crewMembers.findAllByOrderByEmployeeCodeAsc().stream().map(CrewMemberService::toDomain).toList();
+    /** Crew members ordered by employee code. */
+    public Page<CrewMember> list(int page, int size) {
+        return crewMembers.findAllBy(PageRequest.of(page, size, Sort.by("employeeCode")))
+                .map(CrewMemberService::toDomain);
     }
 
     public CrewMember get(String employeeCode) {

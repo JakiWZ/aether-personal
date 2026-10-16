@@ -84,6 +84,7 @@ PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture
 - Errors follow **RFC 9457 Problem Details** (`application/problem+json`) with a stable `code`
   property; no stack traces leak to clients.
 - API documented with OpenAPI (springdoc). Paths are plural nouns under `/api/v1`.
+  List endpoints are paginated (`page`, `size` ≤ 100) and return `PageResponse` (ADR-0011).
 - Tests: JUnit 5 + AssertJ; integration tests with **Testcontainers PostgreSQL** (never H2);
   `@WebMvcTest` for controller contracts. Every business rule has a negative test.
 

@@ -10,6 +10,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subscription } from 'rxjs';
 
 import { ApiError, toApiError } from '../../../core/http/api-error';
+import { DEFAULT_PAGE_SIZE, Page } from '../../../core/http/page';
+import { Pager } from '../../../shared/ui/pager/pager';
 import { Colony, ColonyService, ColonyStatus } from '../data/colony.service';
 
 /** Which bases to show; maps to the `active` query parameter. */
@@ -17,7 +19,7 @@ export type ActivityFilter = 'all' | 'active' | 'inactive';
 
 type ViewState =
   | { readonly kind: 'loading' }
-  | { readonly kind: 'loaded'; readonly colonies: readonly Colony[] }
+  | { readonly kind: 'loaded'; readonly page: Page<Colony> }
   | { readonly kind: 'error'; readonly error: ApiError };
 
 const FILTER_PARAM: Record<ActivityFilter, boolean | undefined> = {
@@ -39,6 +41,7 @@ const STATUS_LABELS: Record<ColonyStatus, string> = {
 @Component({
   selector: 'app-colony-list-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [Pager],
   templateUrl: './colony-list-page.html',
   styleUrls: ['../../../shared/styles/data-view.scss', './colony-list-page.scss'],
 })
@@ -51,10 +54,11 @@ export class ColonyListPage {
   protected readonly state = signal<ViewState>({ kind: 'loading' });
   protected readonly statusLabels = STATUS_LABELS;
 
-  protected readonly loadedColonies = computed(() => {
+  protected readonly colonyPage = computed(() => {
     const state = this.state();
-    return state.kind === 'loaded' ? state.colonies : null;
+    return state.kind === 'loaded' ? state.page : null;
   });
+  private pageIndex = 0;
   protected readonly error = computed(() => {
     const state = this.state();
     return state.kind === 'error' ? state.error : null;
@@ -66,17 +70,18 @@ export class ColonyListPage {
 
   protected onFilterChange(event: Event): void {
     this.filter.set((event.target as HTMLSelectElement).value as ActivityFilter);
-    this.load();
+    this.load(0);
   }
 
-  protected load(): void {
+  protected load(page = this.pageIndex): void {
+    this.pageIndex = page;
     this.request?.unsubscribe();
     this.state.set({ kind: 'loading' });
     this.request = this.colonies
-      .list(FILTER_PARAM[this.filter()])
+      .list(FILTER_PARAM[this.filter()], page, DEFAULT_PAGE_SIZE)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (colonies) => this.state.set({ kind: 'loaded', colonies }),
+        next: (result) => this.state.set({ kind: 'loaded', page: result }),
         error: (error: unknown) => this.state.set({ kind: 'error', error: toApiError(error) }),
       });
   }
