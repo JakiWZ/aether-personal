@@ -155,10 +155,10 @@ that is not a key, apart from the cases listed under 3NF.
 
 ## Follow-ups
 
-Each needs its own issue and migration:
+Each has its own issue and will get its own migration:
 
-1. Composite FKs that tie `id_lot` to `id_resource` in `inventory_stock` and `inventory_movement` (gap 1).
-2. Rename the generated PK/FK/UNIQUE constraint names to the project convention.
+1. Composite FKs that tie `id_lot` to `id_resource` in `inventory_stock` and `inventory_movement` (gap 1): #83.
+2. Rename the generated PK/FK/UNIQUE constraint names to the project convention: #84.
 
 Gaps 2, 3 and 7 are left to the stories that write those tables (TIT-301/ORI-401, ORI-403 and
 ARES-101), which must check them in the service layer and add a negative test.
