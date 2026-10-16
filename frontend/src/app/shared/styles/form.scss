@@ -1,3 +1,5 @@
+// Styles shared by the data entry forms: fields, inline errors, actions.
+
 form {
   max-width: 32rem;
 }
@@ -14,7 +16,8 @@ label {
 }
 
 input[aria-invalid='true'],
-select[aria-invalid='true'] {
+select[aria-invalid='true'],
+textarea[aria-invalid='true'] {
   border-color: var(--aether-danger);
   outline-color: var(--aether-danger);
 }

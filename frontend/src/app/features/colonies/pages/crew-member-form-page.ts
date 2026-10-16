@@ -45,7 +45,7 @@ type FormField =
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [NgTemplateOutlet, ReactiveFormsModule, RouterLink],
   templateUrl: './crew-member-form-page.html',
-  styleUrls: ['../shared/data-view.scss', './crew-member-form-page.scss'],
+  styleUrls: ['../../../shared/styles/data-view.scss', '../../../shared/styles/form.scss'],
 })
 export class CrewMemberFormPage {
   private readonly crew = inject(CrewMemberService);

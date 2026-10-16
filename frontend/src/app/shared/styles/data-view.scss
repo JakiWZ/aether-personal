@@ -1,4 +1,4 @@
-// Styles shared by the colonies & crew screens: message panels, tables, badges.
+// Styles shared by the data screens: message panels, tables, badges.
 .intro {
   color: var(--aether-text-muted);
 }
@@ -13,7 +13,8 @@
 
 select,
 button,
-input {
+input,
+textarea {
   font: inherit;
   padding: 0.25rem 0.5rem;
 }
@@ -54,6 +55,7 @@ td {
 .code {
   font-family: ui-monospace, monospace;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .badge {

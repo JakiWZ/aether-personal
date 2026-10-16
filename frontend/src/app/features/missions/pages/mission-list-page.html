@@ -1,0 +1,65 @@
+<h1>Missions</h1>
+<p class="intro">Missions of every base with their planned window. Times are in UTC.</p>
+
+<div class="toolbar">
+  <a routerLink="new">New mission</a>
+</div>
+
+@if (created(); as code) {
+  <p class="message success" role="status">Mission {{ code }} drafted.</p>
+}
+
+@if (error(); as e) {
+  <div class="message error" role="alert">
+    <p>The missions could not be loaded. {{ e.message }}</p>
+    <button type="button" (click)="load()">Retry</button>
+  </div>
+} @else if (missions(); as list) {
+  @if (list.length === 0) {
+    <p class="message" role="status">No missions planned yet.</p>
+  } @else {
+    <table>
+      <caption class="visually-hidden">
+        Missions
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Code</th>
+          <th scope="col">Title</th>
+          <th scope="col">Type</th>
+          <th scope="col">Base</th>
+          <th scope="col">Planned window (UTC)</th>
+          <th scope="col">Priority</th>
+          <th scope="col">Risk</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (m of list; track m.code) {
+          <tr [class.highlight]="m.code === created()">
+            <td class="code">{{ m.code }}</td>
+            <td>{{ m.title }}</td>
+            <td>{{ typeLabels[m.type] }}</td>
+            <td>{{ m.originColonyCode }}</td>
+            <td class="window">
+              <time [attr.datetime]="m.plannedStartAt">{{
+                m.plannedStartAt | date: 'yyyy-MM-dd HH:mm' : 'UTC'
+              }}</time>
+              to
+              <time [attr.datetime]="m.plannedEndAt">{{
+                m.plannedEndAt | date: 'yyyy-MM-dd HH:mm' : 'UTC'
+              }}</time>
+            </td>
+            <td>{{ priorityLabels[m.priority] }}</td>
+            <td>{{ safetyLabels[m.safetyLevel] }}</td>
+            <td>
+              <span class="badge status">{{ statusLabels[m.status] }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+} @else {
+  <p class="message" role="status">Loading missions…</p>
+}

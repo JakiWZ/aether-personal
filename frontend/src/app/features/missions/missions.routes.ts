@@ -1,7 +1,9 @@
 import { Routes } from '@angular/router';
 
-import { FeaturePlaceholder } from '../../shared/ui/feature-placeholder/feature-placeholder';
+import { MissionFormPage } from './pages/mission-form-page';
+import { MissionListPage } from './pages/mission-list-page';
 
 export const MISSIONS_ROUTES: Routes = [
-  { path: '', component: FeaturePlaceholder, data: { domain: 'missions' } },
+  { path: '', title: 'Missions', component: MissionListPage },
+  { path: 'new', title: 'New mission', component: MissionFormPage },
 ];

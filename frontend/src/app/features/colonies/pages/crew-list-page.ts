@@ -24,7 +24,7 @@ type ViewState =
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [RouterLink],
   templateUrl: './crew-list-page.html',
-  styleUrls: ['../shared/data-view.scss'],
+  styleUrls: ['../../../shared/styles/data-view.scss'],
 })
 export class CrewListPage {
   private readonly crew = inject(CrewMemberService);
