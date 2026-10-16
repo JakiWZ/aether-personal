@@ -1,0 +1,97 @@
+package io.github.jakiwz.aether.crew.domain;
+
+import io.github.jakiwz.aether.colonies.persistence.ColonyEntity;
+import io.github.jakiwz.aether.colonies.persistence.ColonyRepository;
+import io.github.jakiwz.aether.crew.persistence.CrewMemberEntity;
+import io.github.jakiwz.aether.crew.persistence.CrewMemberRepository;
+import io.github.jakiwz.aether.crew.persistence.PersonEntity;
+import io.github.jakiwz.aether.crew.persistence.PersonRepository;
+import io.github.jakiwz.aether.shared.error.BusinessRuleViolationException;
+import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
+import java.util.List;
+import java.util.Locale;
+import org.jspecify.annotations.Nullable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Crew registry (ARES-103). Business keys are normalised (code upper case, email lower case)
+ * before the uniqueness checks; the database unique constraints remain the last line of defence.
+ */
+@Service
+@Transactional(readOnly = true)
+public class CrewMemberService {
+
+    private final CrewMemberRepository crewMembers;
+    private final PersonRepository people;
+    private final ColonyRepository colonies;
+
+    CrewMemberService(CrewMemberRepository crewMembers, PersonRepository people, ColonyRepository colonies) {
+        this.crewMembers = crewMembers;
+        this.people = people;
+        this.colonies = colonies;
+    }
+
+    public List<CrewMember> list() {
+        return crewMembers.findAllByOrderByEmployeeCodeAsc().stream().map(CrewMemberService::toDomain).toList();
+    }
+
+    public CrewMember get(String employeeCode) {
+        return crewMembers.findByEmployeeCode(normaliseCode(employeeCode))
+                .map(CrewMemberService::toDomain)
+                .orElseThrow(() -> new ResourceNotFoundException("Crew member", employeeCode));
+    }
+
+    /** Registers the person and their crew profile in one transaction. */
+    @Transactional
+    public CrewMember register(NewCrewMember request) {
+        String code = normaliseCode(request.employeeCode());
+        String email = normaliseEmail(request.email());
+
+        if (crewMembers.existsByEmployeeCode(code)) {
+            throw new BusinessRuleViolationException(CrewErrorCode.CREW_MEMBER_CODE_TAKEN,
+                    "Crew member code '%s' is already in use.".formatted(code));
+        }
+        if (email != null && people.existsByEmail(email)) {
+            throw new BusinessRuleViolationException(CrewErrorCode.PERSON_EMAIL_TAKEN,
+                    "Email '%s' is already registered.".formatted(email));
+        }
+        ColonyEntity homeColony = resolveHomeColony(request.homeColonyCode());
+
+        PersonEntity person = people.save(new PersonEntity(
+                request.firstName().strip(), request.lastName().strip(), email));
+        CrewMemberEntity crewMember = crewMembers.save(new CrewMemberEntity(
+                person, code, homeColony, request.operationalRole().strip(), request.status()));
+        return toDomain(crewMember);
+    }
+
+    private @Nullable ColonyEntity resolveHomeColony(@Nullable String colonyCode) {
+        if (colonyCode == null || colonyCode.isBlank()) {
+            return null;
+        }
+        ColonyEntity colony = colonies.findByCodeAndDeletedAtIsNull(colonyCode.strip())
+                .orElseThrow(() -> new BusinessRuleViolationException(CrewErrorCode.HOME_COLONY_NOT_FOUND,
+                        "Base '%s' does not exist.".formatted(colonyCode.strip())));
+        if (!colony.isActive()) {
+            throw new BusinessRuleViolationException(CrewErrorCode.HOME_COLONY_INACTIVE,
+                    "Base '%s' is not active and cannot receive crew members.".formatted(colony.getCode()));
+        }
+        return colony;
+    }
+
+    private static String normaliseCode(String code) {
+        return code.strip().toUpperCase(Locale.ROOT);
+    }
+
+    private static @Nullable String normaliseEmail(@Nullable String email) {
+        return email == null || email.isBlank() ? null : email.strip().toLowerCase(Locale.ROOT);
+    }
+
+    private static CrewMember toDomain(CrewMemberEntity entity) {
+        PersonEntity person = entity.getPerson();
+        ColonyEntity colony = entity.getHomeColony();
+        return new CrewMember(entity.getEmployeeCode(), person.getFirstName(), person.getLastName(),
+                person.getEmail(), entity.getOperationalRole(), entity.getStatus(),
+                colony == null ? null : colony.getCode());
+    }
+}
