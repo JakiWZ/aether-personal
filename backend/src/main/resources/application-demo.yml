@@ -1,0 +1,5 @@
+# Demo dataset (TASK-004): Flyway also applies db/demo on top of the versioned schema.
+# Active with `--spring.profiles.active=demo` or `dev`; never in tests or real environments (ADR-0006).
+spring:
+  flyway:
+    locations: classpath:db/migration,classpath:db/demo

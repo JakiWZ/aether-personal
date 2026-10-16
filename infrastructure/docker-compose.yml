@@ -26,7 +26,8 @@ services:
       timeout: 5s
       retries: 10
 
-  # One-shot container that applies the Flyway migrations to the local database.
+  # One-shot container that applies the Flyway migrations to the local database,
+  # including the demo dataset (db/demo, ADR-0006): the local database is a dev database.
   # The backend also runs them on startup; this is handy for DB-only work.
   migrate:
     image: flyway/flyway:12.4.0
@@ -36,11 +37,13 @@ services:
         condition: service_healthy
     volumes:
       - ../backend/src/main/resources/db/migration:/flyway/sql:ro
+      - ../backend/src/main/resources/db/demo:/flyway/demo:ro
     command: >
       -url=jdbc:postgresql://postgres:5432/${AETHER_DB_NAME:-aether}
       -user=${AETHER_DB_USER:-aether}
       -password=${AETHER_DB_PASSWORD:-aether}
       -schemas=aether
+      -locations=filesystem:/flyway/sql,filesystem:/flyway/demo
       migrate
 
 volumes:

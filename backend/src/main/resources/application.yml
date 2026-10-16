@@ -3,6 +3,9 @@
 spring:
   application:
     name: aether-backend
+  profiles:
+    group:
+      dev: demo               # `dev` also loads the demo dataset (application-demo.yml)
   datasource:
     url: jdbc:postgresql://${AETHER_DB_HOST:localhost}:${AETHER_DB_PORT:5432}/${AETHER_DB_NAME:aether}
     username: ${AETHER_DB_USER:aether}
@@ -10,6 +13,9 @@ spring:
   flyway:
     schemas: aether
     default-schema: aether
+    # The demo dataset is a repeatable migration seen only with the `demo` profile (ADR-0006).
+    # Tolerate it in the history when the backend runs without that profile on a demo database.
+    ignore-migration-patterns: "*:future,repeatable:missing"
   jpa:
     open-in-view: false
     hibernate:
