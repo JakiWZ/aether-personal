@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { permissionGuard } from '../../core/auth/auth.guard';
 import { ColoniesLayout } from './colonies-layout';
 import { ColonyListPage } from './pages/colony-list-page';
 import { CrewListPage } from './pages/crew-list-page';
@@ -12,7 +13,12 @@ export const COLONIES_ROUTES: Routes = [
     children: [
       { path: '', title: 'Bases', component: ColonyListPage },
       { path: 'crew', title: 'Crew', component: CrewListPage },
-      { path: 'crew/new', title: 'New crew member', component: CrewMemberFormPage },
+      {
+        path: 'crew/new',
+        title: 'New crew member',
+        canMatch: [permissionGuard('CREW_MANAGE', '/colonies/crew')],
+        component: CrewMemberFormPage,
+      },
     ],
   },
 ];

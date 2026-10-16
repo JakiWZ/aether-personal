@@ -25,6 +25,9 @@ spring:
         default_schema: aether
         jdbc:
           time_zone: UTC      # BR-011: persist instants in UTC
+  autoconfigure:
+    # Accounts live in the database and are checked by LoginService (ADR-0012): no generated user.
+    exclude: org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration
   jackson:
     time-zone: UTC
     # Strict request parsing (OWASP API3/API4:2023): reject what the API does not declare rather than
@@ -44,8 +47,21 @@ spring:
 aether:
   http:
     max-request-body: 64KB             # larger declared bodies get 413 PAYLOAD_TOO_LARGE before being read
+  security:
+    login:                             # IAM-008: lock an account after repeated failures (ADR-0012)
+      max-failed-attempts: 5
+      lock-duration: 15m
 
 server:
+  servlet:
+    session:
+      timeout: 30m                     # idle timeout (OWASP Session Management Cheat Sheet)
+      tracking-modes: cookie           # never put the session id in URLs
+      cookie:
+        name: AETHER_SESSION
+        http-only: true
+        same-site: strict
+        secure: ${AETHER_COOKIE_SECURE:false}   # true wherever the app is served over HTTPS
   error:
     include-stacktrace: never
     include-message: never

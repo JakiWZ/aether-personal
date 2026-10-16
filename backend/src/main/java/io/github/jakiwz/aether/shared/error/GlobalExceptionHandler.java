@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -58,6 +59,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage());
         return problem(HttpStatus.CONFLICT, ErrorCode.DATA_INTEGRITY_VIOLATION,
                 "The request conflicts with the current state of the data.");
+    }
+
+    /** A method-level permission check failed for an authenticated user (ADR-0012). */
+    @ExceptionHandler(AccessDeniedException.class)
+    ProblemDetail handleAccessDenied(AccessDeniedException ex) {
+        log.info("Access denied: {}", ex.getMessage());
+        return problem(HttpStatus.FORBIDDEN, ErrorCode.ACCESS_DENIED, "Your roles do not allow this operation.");
     }
 
     @ExceptionHandler(Exception.class)

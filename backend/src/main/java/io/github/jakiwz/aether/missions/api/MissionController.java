@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,7 @@ class MissionController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('MISSION_READ')")
     @Operation(summary = "List missions", description = "Ordered by planned start, then code.")
     @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: page or size out of range")
     PageResponse<MissionResponse> list(@ParameterObject @Valid PageQuery query) {
@@ -40,6 +42,7 @@ class MissionController {
     }
 
     @GetMapping("/{code}")
+    @PreAuthorize("hasAuthority('MISSION_READ')")
     @Operation(summary = "Get a mission by code")
     @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: code longer than 60 characters")
     @ApiResponse(responseCode = "404", description = "RESOURCE_NOT_FOUND")
@@ -48,6 +51,7 @@ class MissionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('MISSION_MANAGE')")
     @Operation(summary = "Draft a mission (PHX-201)", description = "The mission is created in status DRAFT.")
     @ApiResponse(responseCode = "201", description = "Created; Location points to the new mission")
     @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: missing or invalid fields, "

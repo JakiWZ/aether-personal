@@ -3,7 +3,13 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { TEST_CONFIG, pageOf, provideTestConfig } from '../../../testing/test-config';
+import {
+  SIGNED_IN,
+  TEST_CONFIG,
+  pageOf,
+  provideTestConfig,
+  signIn,
+} from '../../../testing/test-config';
 import { Mission } from '../data/mission.service';
 import { MissionListPage } from './mission-list-page';
 
@@ -129,5 +135,20 @@ describe('MissionListPage', () => {
 
     expect(el().querySelector('[role="alert"]')).toBeNull();
     expect(rows()).toHaveLength(1);
+  });
+
+  it('offers "New mission" only to users allowed to do it', async () => {
+    const createLink = () =>
+      Array.from(el().querySelectorAll('a')).find((a) => a.textContent === 'New mission');
+    signIn({
+      ...SIGNED_IN,
+      permissions: SIGNED_IN.permissions.filter((p) => p !== 'MISSION_MANAGE'),
+    });
+    await respond([]);
+    expect(createLink()).toBeUndefined();
+
+    signIn();
+    await fixture.whenStable();
+    expect(createLink()?.getAttribute('href')).toBe('/new');
   });
 });

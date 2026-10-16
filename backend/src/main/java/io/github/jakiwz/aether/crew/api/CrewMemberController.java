@@ -13,6 +13,7 @@ import java.net.URI;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +34,7 @@ class CrewMemberController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('CREW_READ')")
     @Operation(summary = "List crew members", description = "Ordered by employee code.")
     @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: page or size out of range")
     PageResponse<CrewMemberResponse> list(@ParameterObject @Valid PageQuery query) {
@@ -41,6 +43,7 @@ class CrewMemberController {
     }
 
     @GetMapping("/{employeeCode}")
+    @PreAuthorize("hasAuthority('CREW_READ')")
     @Operation(summary = "Get a crew member by employee code")
     @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: employeeCode longer than 40 characters")
     @ApiResponse(responseCode = "404", description = "RESOURCE_NOT_FOUND")
@@ -49,6 +52,7 @@ class CrewMemberController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAuthority('CREW_MANAGE')")
     @Operation(summary = "Register a crew member (ARES-103)")
     @ApiResponse(responseCode = "201", description = "Created; Location points to the new member")
     @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: missing or invalid fields")

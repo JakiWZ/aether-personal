@@ -3,17 +3,13 @@ package io.github.jakiwz.aether;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayInputStream;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublisher;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
@@ -38,20 +34,18 @@ class HostileInputIT {
             {"employeeCode":"CRW-HOSTILE","firstName":"An\\u0000na","lastName":"Verdi","email":null,
              "operationalRole":"Geologist","status":"ACTIVE","homeColonyCode":null}""";
 
-    private final HttpClient http = HttpClient.newHttpClient();
-
     @LocalServerPort
     int port;
 
     @Test
-    void rejectsTextThatPostgresWouldRefuseAsAValidationError() throws Exception {
+    void rejectsTextThatPostgresWouldRefuseAsAValidationError() {
         HttpResponse<String> response = send("POST", "/api/v1/crew-members", BodyPublishers.ofString(CREW));
 
         assertProblem(response, 400, "VALIDATION_FAILED");
     }
 
     @Test
-    void refusesADeclaredOversizedBodyWithAProblem() throws Exception {
+    void refusesADeclaredOversizedBodyWithAProblem() {
         HttpResponse<String> response = send("POST", "/api/v1/missions",
                 BodyPublishers.ofString("{\"title\":\"" + "x".repeat(70 * 1024) + "\"}"));
 
@@ -59,7 +53,7 @@ class HostileInputIT {
     }
 
     @Test
-    void capsABodySentWithoutALengthWhileParsing() throws Exception {
+    void capsABodySentWithoutALengthWhileParsing() {
         byte[] body = ("{\"title\":\"" + "x".repeat(70 * 1024) + "\"}").getBytes(StandardCharsets.UTF_8);
 
         HttpResponse<String> response = send("POST", "/api/v1/missions",
@@ -69,18 +63,15 @@ class HostileInputIT {
     }
 
     @Test
-    void answersAMethodTheContainerRefusesWithAProblem() throws Exception {
+    void answersAMethodTheContainerRefusesWithAProblem() {
         HttpResponse<String> response = send("TRACE", "/api/v1/missions", BodyPublishers.noBody());
 
         assertProblem(response, 405, "METHOD_NOT_ALLOWED");
     }
 
-    private HttpResponse<String> send(String method, String path, BodyPublisher body) throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + path))
-                .header("Content-Type", "application/json")
-                .method(method, body)
-                .build();
-        return http.send(request, BodyHandlers.ofString());
+    /** Signed in with every permission, so each request reaches the layer under test. */
+    private HttpResponse<String> send(String method, String path, BodyPublisher body) {
+        return BrowserSession.signedIn(port, "admin.neri").send(method, path, body);
     }
 
     private static void assertProblem(HttpResponse<String> response, int status, String code) {

@@ -11,6 +11,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 
+import { AuthService } from '../../../core/auth/auth.service';
 import { ApiError, toApiError } from '../../../core/http/api-error';
 import { Page } from '../../../core/http/page';
 import { Pager } from '../../../shared/ui/pager/pager';
@@ -39,10 +40,13 @@ type ViewState =
 export class MissionListPage {
   private readonly service = inject(MissionService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly auth = inject(AuthService);
 
   /** Code of a mission just drafted, from the `created` query parameter. */
   readonly created = input<string>();
 
+  /** Only offered to who may do it; the server refuses the others anyway. */
+  protected readonly canCreate = computed(() => this.auth.hasPermission('MISSION_MANAGE'));
   protected readonly state = signal<ViewState>({ kind: 'loading' });
   protected readonly statusLabels = MISSION_STATUS_LABELS;
   protected readonly typeLabels = MISSION_TYPE_LABELS;

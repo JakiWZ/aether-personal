@@ -11,6 +11,7 @@ Format: [MADR](https://adr.github.io/madr/). Process: see [ADR-0001](0001-record
 | [0005](0005-rest-error-contract.md) | REST error contract (RFC 9457) | Accepted |
 | [0006](0006-frontend-architecture.md) | Frontend architecture | Accepted |
 | [0007](0007-demo-dataset-as-repeatable-migration.md) | Demo dataset as a profile-scoped repeatable migration | Accepted |
-| [0008](0008-attribute-writes-to-a-system-account.md) | Attribute writes to a system account until authentication exists | Accepted |
+| [0008](0008-attribute-writes-to-a-system-account.md) | Attribute writes to a system account until authentication exists | Superseded by [0012](0012-session-authentication-and-permission-checks.md) |
 | [0010](0010-strict-request-input-and-architecture-tests.md) | Strict request input and architecture tests | Accepted |
 | [0011](0011-paginated-list-endpoints.md) | Paginated list endpoints | Accepted |
+| [0012](0012-session-authentication-and-permission-checks.md) | Session authentication and permission checks | Accepted |

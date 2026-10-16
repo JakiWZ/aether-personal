@@ -1,0 +1,47 @@
+<h1>Sign in</h1>
+<p class="intro">Use your AETHER account. Sessions end after 30 minutes without activity.</p>
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (error(); as message) {
+    <div class="message error" role="alert">
+      <p>{{ message }}</p>
+    </div>
+  }
+
+  <div class="field">
+    <label for="username">Username</label>
+    <input
+      id="username"
+      formControlName="username"
+      autocomplete="username"
+      autocapitalize="none"
+      spellcheck="false"
+      [attr.aria-invalid]="showErrors('username')"
+      [attr.aria-describedby]="showErrors('username') ? 'username-error' : null"
+    />
+    @if (showErrors('username')) {
+      <p class="field-error" id="username-error">Enter your username.</p>
+    }
+  </div>
+
+  <div class="field">
+    <label for="password">Password</label>
+    <input
+      id="password"
+      type="password"
+      formControlName="password"
+      autocomplete="current-password"
+      [attr.aria-invalid]="showErrors('password')"
+      [attr.aria-describedby]="showErrors('password') ? 'password-error' : null"
+    />
+    @if (showErrors('password')) {
+      <p class="field-error" id="password-error">Enter your password.</p>
+    }
+  </div>
+
+  <div class="actions">
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Signing in…' : 'Sign in' }}
+    </button>
+  </div>
+</form>

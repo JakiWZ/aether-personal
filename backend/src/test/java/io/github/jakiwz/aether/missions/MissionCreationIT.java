@@ -1,6 +1,7 @@
 package io.github.jakiwz.aether.missions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -13,6 +14,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -28,6 +30,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("demo")
+@WithMockUser(username = "mc.rossi", authorities = {"MISSION_READ", "MISSION_MANAGE"})
 @Testcontainers
 @Transactional // every creation is rolled back
 class MissionCreationIT {
@@ -58,7 +61,7 @@ class MissionCreationIT {
                 .bodyJson().isLenientlyEqualTo("""
                         {"code":"PHX-020","title":"Jezero delta survey","description":null,
                          "objectives":["Map the delta front"],"type":"EXPLORATION","originColonyCode":"ARS-01",
-                         "status":"DRAFT","priority":"HIGH","safetyLevel":"ELEVATED","createdBy":"system"}""");
+                         "status":"DRAFT","priority":"HIGH","safetyLevel":"ELEVATED","createdBy":"mc.rossi"}""");
         assertThat(mvc.get().uri("/api/v1/missions?size=100"))
                 .bodyJson().extractingPath("$.items[*].code").asArray().contains("PHX-001", "PHX-020");
     }
@@ -75,7 +78,7 @@ class MissionCreationIT {
                 WHERE m.code = 'PHX-020'""");
         assertThat(row).containsEntry("previous_status", null)
                 .containsEntry("new_status", "DRAFT")
-                .containsEntry("username", "system");
+                .containsEntry("username", "mc.rossi");
     }
 
     @Test
@@ -106,7 +109,7 @@ class MissionCreationIT {
     }
 
     private MvcTestResult create(String body) {
-        return mvc.post().uri("/api/v1/missions")
+        return mvc.post().uri("/api/v1/missions").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
                 .exchange();
