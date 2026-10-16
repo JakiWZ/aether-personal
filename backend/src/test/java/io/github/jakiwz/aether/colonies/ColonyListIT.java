@@ -40,8 +40,20 @@ class ColonyListIT {
     void listsTheDemoBasesOrderedByCode() {
         assertThat(mvc.get().uri("/api/v1/colonies"))
                 .hasStatusOk()
-                .bodyJson().extractingPath("$[*].code").asArray()
+                .bodyJson().extractingPath("$.items[*].code").asArray()
                 .containsExactly("ARS-01", "ELY-01", "THR-01", "VLM-01");
+    }
+
+    @Test
+    void pagesThroughTheBasesInCodeOrder() {
+        assertThat(mvc.get().uri("/api/v1/colonies?page=1&size=3"))
+                .hasStatusOk()
+                .bodyJson().isLenientlyEqualTo("""
+                        {"items":[{"code":"VLM-01"}],"page":1,"size":3,"totalItems":4,"totalPages":2}""");
+        assertThat(mvc.get().uri("/api/v1/colonies?page=5&size=3"))
+                .hasStatusOk()
+                .bodyJson().isLenientlyEqualTo("""
+                        {"items":[],"page":5,"totalItems":4,"totalPages":2}""");
     }
 
     @Test
@@ -53,13 +65,13 @@ class ColonyListIT {
 
         assertThat(mvc.get().uri("/api/v1/colonies"))
                 .hasStatusOk()
-                .bodyJson().extractingPath("$[*].code").asArray()
+                .bodyJson().extractingPath("$.items[*].code").asArray()
                 .contains("OLD-01").doesNotContain("DEL-01");
         assertThat(mvc.get().uri("/api/v1/colonies?active=false"))
                 .hasStatusOk()
-                .bodyJson().extractingPath("$[*].code").asArray().containsExactly("OLD-01");
+                .bodyJson().extractingPath("$.items[*].code").asArray().containsExactly("OLD-01");
         assertThat(mvc.get().uri("/api/v1/colonies?active=true"))
                 .hasStatusOk()
-                .bodyJson().extractingPath("$[*].code").asArray().doesNotContain("OLD-01");
+                .bodyJson().extractingPath("$.items[*].code").asArray().doesNotContain("OLD-01");
     }
 }

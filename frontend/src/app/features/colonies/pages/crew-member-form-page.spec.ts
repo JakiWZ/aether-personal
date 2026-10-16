@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 
-import { TEST_CONFIG, provideTestConfig } from '../../../testing/test-config';
+import { TEST_CONFIG, pageOf, provideTestConfig } from '../../../testing/test-config';
 import { Colony } from '../data/colony.service';
 import { CrewMember } from '../data/crew-member.service';
 import { CrewMemberFormPage } from './crew-member-form-page';
@@ -40,7 +40,8 @@ describe('CrewMemberFormPage', () => {
 
     const colonies = http.expectOne((r) => r.url === COLONIES_URL);
     expect(colonies.request.params.get('active')).toBe('true');
-    colonies.flush([ARES]);
+    expect(colonies.request.params.get('size')).toBe('100');
+    colonies.flush(pageOf([ARES]));
     await fixture.whenStable();
   });
 

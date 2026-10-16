@@ -14,8 +14,8 @@
     <p>The missions could not be loaded. {{ e.message }}</p>
     <button type="button" (click)="load()">Retry</button>
   </div>
-} @else if (missions(); as list) {
-  @if (list.length === 0) {
+} @else if (missionPage(); as p) {
+  @if (p.totalItems === 0) {
     <p class="message" role="status">No missions planned yet.</p>
   } @else {
     <table>
@@ -35,7 +35,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (m of list; track m.code) {
+        @for (m of p.items; track m.code) {
           <tr [class.highlight]="m.code === created()">
             <td class="code">{{ m.code }}</td>
             <td>{{ m.title }}</td>
@@ -59,6 +59,7 @@
         }
       </tbody>
     </table>
+    <app-pager [page]="p" singular="mission" plural="missions" (pageChange)="load($event)" />
   }
 } @else {
   <p class="message" role="status">Loading missions…</p>

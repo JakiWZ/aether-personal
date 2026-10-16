@@ -2,12 +2,15 @@ package io.github.jakiwz.aether.crew.api;
 
 import io.github.jakiwz.aether.crew.domain.CrewMember;
 import io.github.jakiwz.aether.crew.domain.CrewMemberService;
+import io.github.jakiwz.aether.shared.web.PageQuery;
+import io.github.jakiwz.aether.shared.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,8 +33,10 @@ class CrewMemberController {
 
     @GetMapping
     @Operation(summary = "List crew members", description = "Ordered by employee code.")
-    List<CrewMemberResponse> list() {
-        return service.list().stream().map(CrewMemberResponse::from).toList();
+    @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: page or size out of range")
+    PageResponse<CrewMemberResponse> list(@ParameterObject @Valid PageQuery query) {
+        return PageResponse.from(service.list(query.pageOrDefault(), query.sizeOrDefault()),
+                CrewMemberResponse::from);
     }
 
     @GetMapping("/{employeeCode}")

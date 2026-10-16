@@ -12,6 +12,7 @@ import {
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 
 import { ApiError, toApiError } from '../../../core/http/api-error';
+import { MAX_PAGE_SIZE } from '../../../core/http/page';
 import { Colony, ColonyService } from '../../colonies/data/colony.service';
 import {
   MISSION_PRIORITIES,
@@ -105,9 +106,12 @@ export class MissionFormPage {
   constructor() {
     // Missions depart from active bases only.
     inject(ColonyService)
-      .list(true)
+      .list(true, 0, MAX_PAGE_SIZE)
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({ next: (list) => this.colonies.set(list), error: () => this.colonies.set([]) });
+      .subscribe({
+        next: (page) => this.colonies.set(page.items),
+        error: () => this.colonies.set([]),
+      });
   }
 
   protected showErrors(name: FormField): boolean {

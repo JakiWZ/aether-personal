@@ -3,7 +3,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { TEST_CONFIG, provideTestConfig } from '../../../testing/test-config';
+import { TEST_CONFIG, pageOf, provideTestConfig } from '../../../testing/test-config';
 import { Mission } from '../data/mission.service';
 import { MissionListPage } from './mission-list-page';
 
@@ -49,7 +49,7 @@ describe('MissionListPage', () => {
   const rows = () => Array.from(el().querySelectorAll('tbody tr'));
 
   async function respond(body: Mission[]): Promise<void> {
-    http.expectOne(URL).flush(body);
+    http.expectOne((r) => r.url === URL).flush(pageOf(body));
     await fixture.whenStable();
   }
 
@@ -74,6 +74,28 @@ describe('MissionListPage', () => {
     );
   });
 
+  it('pages through the missions on the server', async () => {
+    http.expectOne((r) => r.url === URL).flush(pageOf([SURVEY], 0, 20, 45));
+    await fixture.whenStable();
+
+    const pager = el().querySelector('nav[aria-label="Pagination"]')!;
+    expect(pager.textContent).toContain('45 missions');
+    expect(pager.textContent).toContain('page 1 of 3');
+    const [previous, next] = Array.from(pager.querySelectorAll('button'));
+    expect(previous.disabled).toBe(true);
+
+    next.click();
+    const req = http.expectOne((r) => r.url === URL);
+    expect(req.request.params.get('page')).toBe('1');
+    req.flush(pageOf([DRAFT], 1, 20, 45));
+    await fixture.whenStable();
+
+    expect(rows().map((r) => r.querySelector('.code')?.textContent)).toEqual(['PHX-020']);
+    expect(el().querySelector('nav[aria-label="Pagination"]')?.textContent).toContain(
+      'page 2 of 3',
+    );
+  });
+
   it('shows an empty state when no mission exists', async () => {
     await respond([]);
 
@@ -92,7 +114,7 @@ describe('MissionListPage', () => {
 
   it('shows the server error and retries on demand', async () => {
     http
-      .expectOne(URL)
+      .expectOne((r) => r.url === URL)
       .flush(
         { status: 503, code: 'SERVICE_UNAVAILABLE', detail: 'Database offline.' },
         { status: 503, statusText: 'Service Unavailable' },

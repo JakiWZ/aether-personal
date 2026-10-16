@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { APP_CONFIG } from '../../../core/config/app-config';
+import { DEFAULT_PAGE_SIZE, Page, withPage } from '../../../core/http/page';
 
 /** Values of `ck_colony_status`, mirrored by the backend `ColonyStatus` enum. */
 export type ColonyStatus =
@@ -25,9 +26,12 @@ export class ColonyService {
   private readonly http = inject(HttpClient);
   private readonly config = inject(APP_CONFIG);
 
-  /** Lists the bases ordered by code; `active` keeps only active (`true`) or inactive (`false`) ones. */
-  list(active?: boolean): Observable<Colony[]> {
-    const params = active === undefined ? undefined : new HttpParams().set('active', active);
-    return this.http.get<Colony[]>(`${this.config.apiBaseUrl}/colonies`, { params });
+  /** One page of bases ordered by code; `active` keeps only active (`true`) or inactive (`false`) ones. */
+  list(active?: boolean, page = 0, size = DEFAULT_PAGE_SIZE): Observable<Page<Colony>> {
+    let params = withPage(new HttpParams(), page, size);
+    if (active !== undefined) {
+      params = params.set('active', active);
+    }
+    return this.http.get<Page<Colony>>(`${this.config.apiBaseUrl}/colonies`, { params });
   }
 }

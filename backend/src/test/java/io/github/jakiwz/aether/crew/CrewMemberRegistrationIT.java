@@ -53,8 +53,8 @@ class CrewMemberRegistrationIT {
                         {"employeeCode":"CRW-020","firstName":"Anna","lastName":"Verdi",
                          "email":"anna.verdi@aether.demo","operationalRole":"Geologist",
                          "status":"TRAINING","homeColonyCode":"VLM-01"}""");
-        assertThat(mvc.get().uri("/api/v1/crew-members"))
-                .bodyJson().extractingPath("$[*].employeeCode").asArray().contains("CRW-001", "CRW-020");
+        assertThat(mvc.get().uri("/api/v1/crew-members?size=100"))
+                .bodyJson().extractingPath("$.items[*].employeeCode").asArray().contains("CRW-001", "CRW-020");
     }
 
     @Test

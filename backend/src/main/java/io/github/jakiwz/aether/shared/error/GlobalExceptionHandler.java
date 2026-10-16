@@ -116,8 +116,10 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    /** A value that could not even be converted (page=abc) gets a generic message, not the Java type names. */
     private static FieldViolation toViolation(FieldError error) {
-        return new FieldViolation(error.getField(), error.getDefaultMessage());
+        return new FieldViolation(error.getField(),
+                error.isBindingFailure() ? "has an invalid value" : error.getDefaultMessage());
     }
 
     private static String defaultCode(HttpStatusCode status) {
