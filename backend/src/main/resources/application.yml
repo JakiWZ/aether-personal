@@ -76,8 +76,12 @@ management:
       probes:
         enabled: true
 
+# The API description is a map for attackers too (OWASP API9:2023): off unless the `dev` profile
+# (application-dev.yml) or AETHER_API_DOCS_ENABLED turns it on (ADR-0013).
 springdoc:
   api-docs:
+    enabled: ${AETHER_API_DOCS_ENABLED:false}
     path: /v3/api-docs
   swagger-ui:
+    enabled: ${AETHER_API_DOCS_ENABLED:false}
     path: /swagger-ui.html

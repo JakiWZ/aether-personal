@@ -21,7 +21,7 @@ Profile `dev` (or `demo`) also loads the demo dataset from `db/demo`
 | URL | What |
 |-----|------|
 | http://localhost:8080/actuator/health | Liveness/readiness |
-| http://localhost:8080/swagger-ui.html | Interactive API docs |
+| http://localhost:8080/swagger-ui.html | Interactive API docs (`dev` profile or `AETHER_API_DOCS_ENABLED=true`, ADR-0013) |
 | http://localhost:8080/v3/api-docs | OpenAPI contract (JSON) |
 
 Configuration comes from environment variables (defaults match Docker Compose):

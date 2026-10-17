@@ -1,6 +1,7 @@
 package io.github.jakiwz.aether.shared.security;
 
 import jakarta.servlet.DispatcherType;
+import java.time.Duration;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +21,15 @@ import org.springframework.security.web.authentication.logout.HttpStatusReturnin
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.writers.ContentSecurityPolicyHeaderWriter;
+import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy;
+import org.springframework.security.web.header.writers.CrossOriginResourcePolicyHeaderWriter.CrossOriginResourcePolicy;
+import org.springframework.security.web.header.writers.DelegatingRequestMatcherHeaderWriter;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
+import org.springframework.security.web.util.matcher.NegatedRequestMatcher;
+import org.springframework.security.web.util.matcher.OrRequestMatcher;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
 /**
  * Session-cookie authentication for the SPA, CSRF tokens in a cookie the SPA echoes in a header,
@@ -32,6 +43,18 @@ public class SecurityConfig {
     public static final String LOGIN_PATH = "/api/v1/auth/login";
     public static final String SESSION_PATH = "/api/v1/auth/session";
     public static final String LOGOUT_PATH = "/api/v1/auth/logout";
+
+    /** JSON responses never load, embed or submit anything. */
+    static final String API_CONTENT_SECURITY_POLICY =
+            "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'";
+
+    /** Swagger UI loads its bundled script and styles from this origin only. */
+    static final String SWAGGER_UI_CONTENT_SECURITY_POLICY = "default-src 'self'; img-src 'self' data:; "
+            + "style-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'";
+
+    /** Browser features the application never uses. */
+    static final String PERMISSIONS_POLICY =
+            "camera=(), microphone=(), geolocation=(), payment=(), usb=()";
 
     /** Id of the current password hashing scheme, stored as the {@code {argon2id}} hash prefix. */
     private static final String PASSWORD_ENCODING = "argon2id";
@@ -58,8 +81,32 @@ public class SecurityConfig {
                         .deleteCookies(sessionCookie))
                 .requestCache(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable);
+                .formLogin(AbstractHttpConfigurer::disable)
+                .headers(SecurityConfig::securityHeaders);
         return http.build();
+    }
+
+    /**
+     * Response headers of OWASP Secure Headers / ASVS V3.4, on top of Spring Security's defaults
+     * ({@code X-Content-Type-Options}, {@code X-Frame-Options: DENY}, {@code Cache-Control: no-store},
+     * HSTS on HTTPS requests). The API serves JSON only, so its content policy allows nothing; the
+     * Swagger UI page, exposed only in development (ADR-0013), may load its own scripts and styles.
+     */
+    private static void securityHeaders(HeadersConfigurer<HttpSecurity> headers) {
+        RequestMatcher swaggerUi = new OrRequestMatcher(
+                PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui.html"),
+                PathPatternRequestMatcher.withDefaults().matcher("/swagger-ui/**"));
+        headers
+                .addHeaderWriter(new DelegatingRequestMatcherHeaderWriter(new NegatedRequestMatcher(swaggerUi),
+                        new ContentSecurityPolicyHeaderWriter(API_CONTENT_SECURITY_POLICY)))
+                .addHeaderWriter(new DelegatingRequestMatcherHeaderWriter(swaggerUi,
+                        new ContentSecurityPolicyHeaderWriter(SWAGGER_UI_CONTENT_SECURITY_POLICY)))
+                .referrerPolicy(referrer -> referrer.policy(ReferrerPolicy.NO_REFERRER))
+                .permissionsPolicyHeader(permissions -> permissions.policy(PERMISSIONS_POLICY))
+                .crossOriginOpenerPolicy(coop -> coop.policy(CrossOriginOpenerPolicy.SAME_ORIGIN))
+                .crossOriginResourcePolicy(corp -> corp.policy(CrossOriginResourcePolicy.SAME_ORIGIN))
+                .httpStrictTransportSecurity(hsts -> hsts.maxAgeInSeconds(Duration.ofDays(365).toSeconds())
+                        .includeSubDomains(true));
     }
 
     /**
