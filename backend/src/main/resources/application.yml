@@ -66,6 +66,15 @@ server:
     include-stacktrace: never
     include-message: never
 
+# NFR-009, ADR-0014: one JSON object per line (Elastic Common Schema) with AETHER_LOG_FORMAT=ecs,
+# as a log shipper expects; readable text otherwise. Both carry the request's correlation id.
+logging:
+  structured:
+    format:
+      console: ${AETHER_LOG_FORMAT:}
+  pattern:
+    correlation: "[%X{correlationId:-}] "
+
 management:
   endpoints:
     web:

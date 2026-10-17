@@ -1,5 +1,7 @@
 package io.github.jakiwz.aether.crew.domain;
 
+import io.github.jakiwz.aether.audit.domain.AuditAction;
+import io.github.jakiwz.aether.audit.domain.AuditTrail;
 import io.github.jakiwz.aether.colonies.persistence.ColonyEntity;
 import io.github.jakiwz.aether.colonies.persistence.ColonyRepository;
 import io.github.jakiwz.aether.crew.persistence.CrewMemberEntity;
@@ -8,7 +10,9 @@ import io.github.jakiwz.aether.crew.persistence.PersonEntity;
 import io.github.jakiwz.aether.crew.persistence.PersonRepository;
 import io.github.jakiwz.aether.shared.error.BusinessRuleViolationException;
 import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Crew registry (ARES-103). Business keys are normalised (code upper case, email lower case)
  * before the uniqueness checks; the database unique constraints remain the last line of defence.
+ * Registrations go to the audit trail without personal data (ADR-0014).
  */
 @Service
 @Transactional(readOnly = true)
@@ -27,11 +32,14 @@ public class CrewMemberService {
     private final CrewMemberRepository crewMembers;
     private final PersonRepository people;
     private final ColonyRepository colonies;
+    private final AuditTrail audit;
 
-    CrewMemberService(CrewMemberRepository crewMembers, PersonRepository people, ColonyRepository colonies) {
+    CrewMemberService(CrewMemberRepository crewMembers, PersonRepository people, ColonyRepository colonies,
+            AuditTrail audit) {
         this.crewMembers = crewMembers;
         this.people = people;
         this.colonies = colonies;
+        this.audit = audit;
     }
 
     /** Crew members ordered by employee code. */
@@ -66,6 +74,10 @@ public class CrewMemberService {
                 request.firstName().strip(), request.lastName().strip(), email));
         CrewMemberEntity crewMember = crewMembers.save(new CrewMemberEntity(
                 person, code, homeColony, request.operationalRole().strip(), request.status()));
+        Map<String, Object> snapshot = new LinkedHashMap<>();
+        snapshot.put("status", request.status());
+        snapshot.put("homeColonyCode", homeColony == null ? null : homeColony.getCode());
+        audit.record(AuditAction.CREW_MEMBER_REGISTERED, "CREW_MEMBER", code, snapshot);
         return toDomain(crewMember);
     }
 

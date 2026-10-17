@@ -17,10 +17,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * Refuses a request whose declared body is larger than {@code aether.http.max-request-body}
  * with 413 before anything reads it (OWASP API4:2023, unrestricted resource consumption).
  * Bodies sent without a length are capped while parsing by Jackson's {@code max-document-length}.
- * Runs before Spring Security so that oversized bodies are refused even before authentication.
+ * Runs right after the correlation id filter and before Spring Security, so that oversized bodies
+ * are refused even before authentication.
  */
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 class RequestSizeLimitFilter extends OncePerRequestFilter {
 
     private final long maxBytes;

@@ -16,3 +16,4 @@ Format: [MADR](https://adr.github.io/madr/). Process: see [ADR-0001](0001-record
 | [0011](0011-paginated-list-endpoints.md) | Paginated list endpoints | Accepted |
 | [0012](0012-session-authentication-and-permission-checks.md) | Session authentication and permission checks | Accepted |
 | [0013](0013-security-headers-and-dev-only-api-docs.md) | Security response headers and API documentation only in development | Accepted |
+| [0014](0014-correlation-id-structured-logs-and-audit-trail.md) | Correlation id, structured logs and the audit trail | Accepted |
