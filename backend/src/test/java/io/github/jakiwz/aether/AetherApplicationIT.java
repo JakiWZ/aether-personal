@@ -66,10 +66,24 @@ class AetherApplicationIT {
     }
 
     @Test
-    void publishesTheOpenApiContract() {
-        assertThat(mvc.get().uri("/v3/api-docs"))
-                .hasStatusOk()
-                .bodyJson().extractingPath("$.info.title").asString().startsWith("AETHER");
+    void keepsTheApiDescriptionPrivateOutsideDevelopment() {
+        assertThat(mvc.get().uri("/v3/api-docs")).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(mvc.get().uri("/swagger-ui.html")).hasStatus(HttpStatus.NOT_FOUND);
+    }
+
+    @Test
+    void sendsTheSecurityHeadersOnEveryApiResponse() {
+        assertThat(mvc.get().uri("/api/v1/missions"))
+                .hasStatus(HttpStatus.UNAUTHORIZED)
+                .headers()
+                .hasValue("Content-Security-Policy",
+                        "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+                .hasValue("Referrer-Policy", "no-referrer")
+                .hasValue("X-Content-Type-Options", "nosniff")
+                .hasValue("X-Frame-Options", "DENY")
+                .hasValue("Cross-Origin-Opener-Policy", "same-origin")
+                .hasValue("Cross-Origin-Resource-Policy", "same-origin")
+                .containsHeader("Permissions-Policy");
     }
 
     @Test

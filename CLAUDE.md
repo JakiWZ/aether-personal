@@ -110,9 +110,9 @@ docker compose -f infrastructure/docker-compose.yml up -d
 docker compose -f infrastructure/docker-compose.yml --profile tools run --rm migrate   # apply migrations + demo data
 docker compose -f infrastructure/docker-compose.yml down -v                           # reset
 
-# Backend (from backend/): Swagger UI at http://localhost:8080/swagger-ui.html
+# Backend (from backend/): Swagger UI at http://localhost:8080/swagger-ui.html with the dev profile
 ./mvnw spring-boot:run
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev   # + demo dataset (docs/database/demo-dataset.md)
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev   # + demo dataset and API docs (ADR-0013)
 ./mvnw test      # fast tests, no Docker
 ./mvnw verify    # + Testcontainers integration tests (*IT), needs Docker
 

@@ -133,6 +133,23 @@ class EndpointSecurityTest {
                 HttpStatus.UNAUTHORIZED, "AUTHENTICATION_REQUIRED");
     }
 
+    @Test
+    void asksBrowsersToStayOnHttpsOnceTheyUsedIt() {
+        assertThat(mvc.get().uri("/api/v1/missions").secure(true).exchange())
+                .headers().hasValue("Strict-Transport-Security", "max-age=31536000 ; includeSubDomains");
+        assertThat(mvc.get().uri("/api/v1/missions").exchange())
+                .headers().doesNotContainHeader("Strict-Transport-Security");
+    }
+
+    @Test
+    void forbidsEmbeddingAndBrowserFeaturesOnEveryResponse() {
+        assertThat(mvc.get().uri("/api/v1/missions").exchange()).headers()
+                .hasValue("Content-Security-Policy", SecurityConfig.API_CONTENT_SECURITY_POLICY)
+                .hasValue("Permissions-Policy", SecurityConfig.PERMISSIONS_POLICY)
+                .hasValue("Referrer-Policy", "no-referrer")
+                .hasValue("X-Frame-Options", "DENY");
+    }
+
     private MockMvcRequestBuilder request(HttpMethod method, String path, String body) {
         MockMvcRequestBuilder request = mvc.method(method).uri(path);
         return body == null ? request : request.contentType(MediaType.APPLICATION_JSON).content(body);
