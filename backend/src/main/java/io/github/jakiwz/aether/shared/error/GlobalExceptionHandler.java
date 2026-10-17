@@ -47,7 +47,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ResponseEntity<ProblemDetail> handleTooManyLoginAttempts(TooManyLoginAttemptsException ex) {
         return ResponseEntity.status(ex.status())
                 .header(HttpHeaders.RETRY_AFTER, Long.toString(ex.retryAfterSeconds()))
-                .body(problem(ex.status(), ex.code(), ex.getMessage()));
+                .body(problem(ex.status(), ex.code(), message(ex)));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)

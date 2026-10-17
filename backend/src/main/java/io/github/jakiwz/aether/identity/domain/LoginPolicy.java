@@ -27,7 +27,7 @@ public record LoginPolicy(@Min(1) int maxFailedAttempts, Duration lockDuration, 
             lockDuration = Duration.ofMinutes(15);
         }
         if (rateLimit == null) {
-            rateLimit = new RateLimit(0, null, 0);
+            rateLimit = new RateLimit(10, Duration.ofMinutes(1), 10_000);
         }
     }
 
