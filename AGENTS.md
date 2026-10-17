@@ -36,6 +36,8 @@ cd frontend && npm ci && npm test && npm run lint && npm run format:check && npm
 - State changes and security events go to `AuditTrail` (ADR-0014). Never log or store passwords or
   personal data.
 - Every business rule has a negative test. Integration tests use PostgreSQL via Testcontainers, never H2.
+- Error Prone and NullAway run in every backend build (ADR-0015). Mark nullable values with JSpecify
+  `@Nullable` and fix findings instead of suppressing them.
 - Never weaken a test, skip a check or disable a constraint to get green. Never commit secrets.
 - When a story closes, update its requirement rows in `traceability.md`.
 - Any significant technical decision gets an ADR.

@@ -3,6 +3,7 @@ package io.github.jakiwz.aether.shared.security;
 import jakarta.servlet.DispatcherType;
 import java.time.Duration;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -143,12 +144,12 @@ public class SecurityConfig {
     private static final class NeverMatchingPasswordEncoder implements PasswordEncoder {
 
         @Override
-        public String encode(CharSequence rawPassword) {
+        public String encode(@Nullable CharSequence rawPassword) {
             throw new UnsupportedOperationException("Only used to reject unknown hash formats");
         }
 
         @Override
-        public boolean matches(CharSequence rawPassword, String encodedPassword) {
+        public boolean matches(@Nullable CharSequence rawPassword, @Nullable String encodedPassword) {
             return false;
         }
     }
