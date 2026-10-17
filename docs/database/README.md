@@ -79,6 +79,6 @@ Kept from the original master script:
 - **F.** Closing CRITICAL incidents requires authorisation, reason and an audit event.
 - **G.** Historical records are not physically deleted by normal user workflows.
 - **H.** Closing an alert never deletes telemetry.
-- **I.** `audit_event` is append-only from the application's point of view.
+- **I.** `audit_event` is append-only from the application's point of view: `AuditTrail` only inserts (ADR-0014).
 - **J.** `telemetry_measurement` may later move to a time-series/Big Data store; PostgreSQL remains
   the source of truth for sensors, alerts and transactional data.

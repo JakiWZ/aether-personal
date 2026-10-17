@@ -1,5 +1,7 @@
 package io.github.jakiwz.aether.missions.domain;
 
+import io.github.jakiwz.aether.audit.domain.AuditAction;
+import io.github.jakiwz.aether.audit.domain.AuditTrail;
 import io.github.jakiwz.aether.colonies.persistence.ColonyEntity;
 import io.github.jakiwz.aether.colonies.persistence.ColonyRepository;
 import io.github.jakiwz.aether.identity.domain.CurrentActor;
@@ -15,7 +17,9 @@ import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.Locale;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +29,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Mission planning (PHOENIX). A mission is always created as {@link MissionStatus#DRAFT}, from an
- * active base, and its first status is recorded in the history with its author (BR-012).
+ * active base, and its first status is recorded in the history with its author (BR-012) and in
+ * the audit trail (ADR-0014).
  * The time window is validated at the API boundary and again by {@code ck_mission_planned_dates}.
  */
 @Service
@@ -37,14 +42,16 @@ public class MissionService {
     private final ColonyRepository colonies;
     private final UserAccountRepository accounts;
     private final CurrentActor actor;
+    private final AuditTrail audit;
 
     MissionService(MissionRepository missions, MissionStatusHistoryRepository history, ColonyRepository colonies,
-            UserAccountRepository accounts, CurrentActor actor) {
+            UserAccountRepository accounts, CurrentActor actor, AuditTrail audit) {
         this.missions = missions;
         this.history = history;
         this.colonies = colonies;
         this.accounts = accounts;
         this.actor = actor;
+        this.audit = audit;
     }
 
     /** Missions ordered by planned start, then code. */
@@ -78,7 +85,21 @@ public class MissionService {
         mission.addObjective(request.objective().strip());
         missions.save(mission);
         history.save(new MissionStatusHistoryEntity(mission, null, mission.getStatus(), author, now));
+        audit.recordFor(author.getId(), AuditAction.MISSION_CREATED, "MISSION", code, auditSnapshot(mission), null);
         return toDomain(mission);
+    }
+
+    /** What an auditor needs to reconstruct the change (UC-07): the state and plan, not the free text. */
+    private static Map<String, Object> auditSnapshot(MissionEntity mission) {
+        Map<String, Object> snapshot = new LinkedHashMap<>();
+        snapshot.put("status", mission.getStatus());
+        snapshot.put("type", mission.getType());
+        snapshot.put("originColonyCode", mission.getOriginColony().getCode());
+        snapshot.put("plannedStartAt", mission.getPlannedStartAt());
+        snapshot.put("plannedEndAt", mission.getPlannedEndAt());
+        snapshot.put("priority", mission.getPriority());
+        snapshot.put("safetyLevel", mission.getSafetyLevel());
+        return snapshot;
     }
 
     private ColonyEntity resolveOrigin(String colonyCode) {

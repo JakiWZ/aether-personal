@@ -19,7 +19,7 @@ atomic transfers, auditable state changes) must hold **server-side**, never only
 | `backend/` | Spring Boot REST API (Java 21, Maven). Flyway migrations in `src/main/resources/db/migration`. |
 | `frontend/` | Angular 22 SPA (standalone components, signals, zoneless). Layout in `frontend/README.md`. |
 | `infrastructure/` | Docker Compose for local dev, later IaC. |
-| `docs/requirements/` | Client requirements (capitolato): functional reqs, business rules `BR-xxx`, NFRs. |
+| `docs/requirements/` | Client requirements (capitolato): functional reqs, business rules `BR-xxx`, NFRs; `traceability.md` maps each one to its issue, status and tests. |
 | `docs/sprints/` | Sprint mission packs with detailed acceptance criteria per story. |
 | `docs/adr/` | Architecture Decision Records (MADR). **Every significant technical decision gets one.** |
 | `docs/agile/` | Definition of Ready/Done, ceremonies, Git workflow. |
@@ -49,7 +49,8 @@ atomic transfers, auditable state changes) must hold **server-side**, never only
 
 Acceptance criteria met · builds · DB changes are versioned migrations · server-side validation ·
 consistent error responses · automated tests including **at least one negative case** ·
-PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture changed.
+PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture changed ·
+the rows of the covered requirements updated in `docs/requirements/traceability.md` (`TraceabilityMatrixTest`).
 
 ## Engineering standards
 
@@ -85,6 +86,14 @@ PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture
   property; no stack traces leak to clients.
 - API documented with OpenAPI (springdoc). Paths are plural nouns under `/api/v1`.
   List endpoints are paginated (`page`, `size` ≤ 100) and return `PageResponse` (ADR-0011).
+- Security (ADR-0012): session cookie + CSRF token, deny by default. Every endpoint carries
+  `@PreAuthorize` with a permission code from the `permission` table (`ArchitectureTest` checks it).
+  `@WebMvcTest`s `@Import(SecurityConfig.class)`, use `@WithMockUser(authorities = …)` and
+  `.with(csrf())` on writes, and include the 401/403 negative cases.
+- Audit (ADR-0014): every state change and security event calls `AuditTrail` inside its transaction;
+  no passwords or personal data in snapshots. Logs carry the request's `correlationId` (MDC).
+- Static analysis (ADR-0015): Error Prone and NullAway run in every `javac`; mark nullable values with
+  JSpecify `@Nullable` and fix findings instead of suppressing them.
 - Tests: JUnit 5 + AssertJ; integration tests with **Testcontainers PostgreSQL** (never H2);
   `@WebMvcTest` for controller contracts. Every business rule has a negative test.
 
@@ -94,6 +103,7 @@ PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture
 - Every data view handles loading, empty and error states. Forms use typed reactive forms;
   client validation is for UX only — the server is authoritative.
 - Accessibility (labels, keyboard navigation, contrast) is part of done.
+- Feature routes use `authGuard`; hide actions with `AuthService.hasPermission` (UX only).
 
 ## Commands
 
@@ -105,9 +115,9 @@ docker compose -f infrastructure/docker-compose.yml up -d
 docker compose -f infrastructure/docker-compose.yml --profile tools run --rm migrate   # apply migrations + demo data
 docker compose -f infrastructure/docker-compose.yml down -v                           # reset
 
-# Backend (from backend/): Swagger UI at http://localhost:8080/swagger-ui.html
+# Backend (from backend/): Swagger UI at http://localhost:8080/swagger-ui.html with the dev profile
 ./mvnw spring-boot:run
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev   # + demo dataset (docs/database/demo-dataset.md)
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev   # + demo dataset and API docs (ADR-0013)
 ./mvnw test      # fast tests, no Docker
 ./mvnw verify    # + Testcontainers integration tests (*IT), needs Docker
 

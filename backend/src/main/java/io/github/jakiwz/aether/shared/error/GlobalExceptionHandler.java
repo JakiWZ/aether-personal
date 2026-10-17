@@ -3,6 +3,7 @@ package io.github.jakiwz.aether.shared.error;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,7 +39,15 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(AetherException.class)
     ProblemDetail handleAetherException(AetherException ex) {
         log.debug("Request rejected: {} - {}", ex.code(), ex.getMessage());
-        return problem(ex.status(), ex.code(), ex.getMessage());
+        return problem(ex.status(), ex.code(), message(ex));
+    }
+
+    /** A throttled login: the problem plus {@code Retry-After}, so a client knows when to retry. */
+    @ExceptionHandler(TooManyLoginAttemptsException.class)
+    ResponseEntity<ProblemDetail> handleTooManyLoginAttempts(TooManyLoginAttemptsException ex) {
+        return ResponseEntity.status(ex.status())
+                .header(HttpHeaders.RETRY_AFTER, Long.toString(ex.retryAfterSeconds()))
+                .body(problem(ex.status(), ex.code(), message(ex)));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -58,6 +68,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         log.warn("Data integrity violation: {}", ex.getMostSpecificCause().getMessage());
         return problem(HttpStatus.CONFLICT, ErrorCode.DATA_INTEGRITY_VIOLATION,
                 "The request conflicts with the current state of the data.");
+    }
+
+    /** A method-level permission check failed for an authenticated user (ADR-0012). */
+    @ExceptionHandler(AccessDeniedException.class)
+    ProblemDetail handleAccessDenied(AccessDeniedException ex) {
+        log.info("Access denied: {}", ex.getMessage());
+        return problem(HttpStatus.FORBIDDEN, ErrorCode.ACCESS_DENIED, "Your roles do not allow this operation.");
     }
 
     @ExceptionHandler(Exception.class)
@@ -83,8 +100,9 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         List<FieldViolation> errors = ex.getParameterValidationResults().stream()
                 .flatMap(result -> result.getResolvableErrors().stream()
                         .map(error -> new FieldViolation(
-                                result.getMethodParameter().getParameterName(),
-                                error.getDefaultMessage())))
+                                Objects.requireNonNullElse(result.getMethodParameter().getParameterName(),
+                                        "argument"),
+                                Objects.requireNonNullElse(error.getDefaultMessage(), "is invalid"))))
                 .toList();
         return ResponseEntity.badRequest().body(validationProblem(errors));
     }
@@ -119,6 +137,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     /** A value that could not even be converted (page=abc) gets a generic message, not the Java type names. */
     private static FieldViolation toViolation(FieldError error) {
         return new FieldViolation(error.getField(),
-                error.isBindingFailure() ? "has an invalid value" : error.getDefaultMessage());
+                error.isBindingFailure()
+                        ? "has an invalid value"
+                        : Objects.requireNonNullElse(error.getDefaultMessage(), "is invalid"));
+    }
+
+    /** Messages of {@link AetherException}s are written for clients; every constructor sets one. */
+    private static String message(AetherException ex) {
+        return Objects.requireNonNullElse(ex.getMessage(), "The request was rejected.");
     }
 }

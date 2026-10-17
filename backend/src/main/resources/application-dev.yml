@@ -1,0 +1,7 @@
+# Local development (`--spring.profiles.active=dev`, which also enables `demo`).
+# Publishes the OpenAPI description and Swagger UI; never use this profile in a shared environment (ADR-0013).
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

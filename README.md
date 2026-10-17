@@ -58,8 +58,13 @@ cd frontend && npm ci && npm start
 | URL | What |
 |-----|------|
 | http://localhost:4200 | Web application (Mission Control) |
-| http://localhost:8080/swagger-ui.html | API documentation (OpenAPI) |
+| http://localhost:8080/swagger-ui.html | API documentation (OpenAPI), `dev` profile only (ADR-0013) |
 | http://localhost:8080/actuator/health | Health check |
+
+With the demo dataset, sign in as any demo account (for example `mc.rossi`, Mission Controller, or
+`crew.conti`, read-only crew) with the demo-only password `Aether-demo-password`; the accounts and
+their roles are listed in [`docs/database/demo-dataset.md`](docs/database/demo-dataset.md).
+Without the demo dataset there are no accounts that can sign in yet (ADR-0012).
 
 More: [`backend/README.md`](backend/README.md), [`frontend/README.md`](frontend/README.md),
 [`docs/database/README.md`](docs/database/README.md).

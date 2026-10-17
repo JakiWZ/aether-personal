@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.unit.DataSize;
@@ -15,8 +17,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * Refuses a request whose declared body is larger than {@code aether.http.max-request-body}
  * with 413 before anything reads it (OWASP API4:2023, unrestricted resource consumption).
  * Bodies sent without a length are capped while parsing by Jackson's {@code max-document-length}.
+ * Runs right after the correlation id filter and before Spring Security, so that oversized bodies
+ * are refused even before authentication.
  */
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE + 1)
 class RequestSizeLimitFilter extends OncePerRequestFilter {
 
     private final long maxBytes;

@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,6 +29,7 @@ class ColonyController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('COLONY_READ')")
     @Operation(summary = "List bases",
             description = "Bases ordered by code, inactive ones included unless filtered out (ARES-101).")
     @ApiResponse(responseCode = "400", description = "VALIDATION_FAILED: page or size out of range")

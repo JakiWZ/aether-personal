@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import io.github.jakiwz.aether.colonies.domain.ColonyService;
 import io.github.jakiwz.aether.crew.domain.CrewMemberService;
+import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
+import io.github.jakiwz.aether.identity.domain.LoginService;
 import io.github.jakiwz.aether.missions.domain.Mission;
 import io.github.jakiwz.aether.missions.domain.MissionPriority;
 import io.github.jakiwz.aether.missions.domain.MissionService;
@@ -15,6 +18,7 @@ import io.github.jakiwz.aether.missions.domain.MissionType;
 import io.github.jakiwz.aether.missions.domain.SafetyLevel;
 import io.github.jakiwz.aether.shared.config.JacksonConfig;
 import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
+import io.github.jakiwz.aether.shared.security.SecurityConfig;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,6 +31,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -37,7 +42,8 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
  * a call into the domain.
  */
 @WebMvcTest
-@Import(JacksonConfig.class)
+@Import({JacksonConfig.class, SecurityConfig.class})
+@WithMockUser(authorities = {"MISSION_READ", "MISSION_MANAGE", "CREW_READ", "CREW_MANAGE", "COLONY_READ"})
 class HostileInputTest {
 
     private static final String MISSION = """
@@ -61,6 +67,12 @@ class HostileInputTest {
 
     @MockitoBean
     ColonyService colonies;
+
+    @MockitoBean
+    LoginService logins;
+
+    @MockitoBean
+    LoginRateLimiter rateLimiter;
 
     static Stream<Arguments> hostileMissions() {
         return Stream.of(
@@ -91,7 +103,7 @@ class HostileInputTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("hostileMissions")
     void rejectsHostileMissionBodies(String name, String body, HttpStatus status, String code, String field) {
-        MvcTestResult result = mvc.post().uri("/api/v1/missions")
+        MvcTestResult result = mvc.post().uri("/api/v1/missions").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON).content(body).exchange();
 
         assertProblem(result, status, code);
@@ -103,7 +115,7 @@ class HostileInputTest {
 
     @Test
     void rejectsControlCharactersInCrewNames() {
-        MvcTestResult result = mvc.post().uri("/api/v1/crew-members")
+        MvcTestResult result = mvc.post().uri("/api/v1/crew-members").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON).content(CREW.replace("Anna", "An\\u0000na")).exchange();
 
         assertProblem(result, HttpStatus.BAD_REQUEST, "VALIDATION_FAILED");
@@ -117,7 +129,7 @@ class HostileInputTest {
                 OffsetDateTime.parse("2099-05-03T18:00:00Z"), MissionStatus.DRAFT, MissionPriority.HIGH,
                 SafetyLevel.ELEVATED, "system", OffsetDateTime.parse("2026-10-16T10:00:00Z")));
 
-        assertThat(mvc.post().uri("/api/v1/missions").contentType(MediaType.APPLICATION_JSON)
+        assertThat(mvc.post().uri("/api/v1/missions").with(csrf()).contentType(MediaType.APPLICATION_JSON)
                 .content(MISSION.replace("Line one", "Line one\\n\\tLine two 🚀")))
                 .hasStatus(HttpStatus.CREATED);
     }
@@ -126,14 +138,14 @@ class HostileInputTest {
     void refusesADeclaredBodyOverTheLimitBeforeReadingIt() {
         String body = MISSION.replace("Line one", "x".repeat(70 * 1024));
 
-        assertThat(mvc.post().uri("/api/v1/missions").contentType(MediaType.APPLICATION_JSON).content(body))
+        assertThat(mvc.post().uri("/api/v1/missions").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body))
                 .hasStatus(HttpStatus.CONTENT_TOO_LARGE);
         verifyNoInteractions(missions);
     }
 
     @Test
     void refusesAnUnsupportedMediaType() {
-        assertProblem(mvc.post().uri("/api/v1/missions").contentType(MediaType.APPLICATION_XML)
+        assertProblem(mvc.post().uri("/api/v1/missions").with(csrf()).contentType(MediaType.APPLICATION_XML)
                 .content("<mission/>").exchange(), HttpStatus.UNSUPPORTED_MEDIA_TYPE, "UNSUPPORTED_MEDIA_TYPE");
     }
 

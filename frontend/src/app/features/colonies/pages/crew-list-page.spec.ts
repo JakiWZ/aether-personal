@@ -3,7 +3,13 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
-import { TEST_CONFIG, pageOf, provideTestConfig } from '../../../testing/test-config';
+import {
+  SIGNED_IN,
+  TEST_CONFIG,
+  pageOf,
+  provideTestConfig,
+  signIn,
+} from '../../../testing/test-config';
 import { CrewMember } from '../data/crew-member.service';
 import { CrewListPage } from './crew-list-page';
 
@@ -113,5 +119,17 @@ describe('CrewListPage', () => {
 
     expect(el().querySelector('[role="alert"]')).toBeNull();
     expect(rows()).toHaveLength(1);
+  });
+
+  it('offers "New crew member" only to users allowed to do it', async () => {
+    const createLink = () =>
+      Array.from(el().querySelectorAll('a')).find((a) => a.textContent === 'New crew member');
+    signIn({ ...SIGNED_IN, permissions: SIGNED_IN.permissions.filter((p) => p !== 'CREW_MANAGE') });
+    await respond([]);
+    expect(createLink()).toBeUndefined();
+
+    signIn();
+    await fixture.whenStable();
+    expect(createLink()?.getAttribute('href')).toBe('/new');
   });
 });

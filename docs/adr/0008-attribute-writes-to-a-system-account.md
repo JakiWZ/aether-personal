@@ -1,6 +1,6 @@
 # ADR-0008: Attribute writes to a system account until authentication exists
 
-- **Status:** Accepted
+- **Status:** Superseded by [ADR-0012](0012-session-authentication-and-permission-checks.md) for requests made by users
 - **Date:** 2026-10-16
 - **Issue:** #22 (PHX-201)
 

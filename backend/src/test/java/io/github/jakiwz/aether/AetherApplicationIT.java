@@ -9,8 +9,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpStatus;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -65,13 +66,28 @@ class AetherApplicationIT {
     }
 
     @Test
-    void publishesTheOpenApiContract() {
-        assertThat(mvc.get().uri("/v3/api-docs"))
-                .hasStatusOk()
-                .bodyJson().extractingPath("$.info.title").asString().startsWith("AETHER");
+    void keepsTheApiDescriptionPrivateOutsideDevelopment() {
+        assertThat(mvc.get().uri("/v3/api-docs")).hasStatus(HttpStatus.NOT_FOUND);
+        assertThat(mvc.get().uri("/swagger-ui.html")).hasStatus(HttpStatus.NOT_FOUND);
     }
 
     @Test
+    void sendsTheSecurityHeadersOnEveryApiResponse() {
+        assertThat(mvc.get().uri("/api/v1/missions"))
+                .hasStatus(HttpStatus.UNAUTHORIZED)
+                .headers()
+                .hasValue("Content-Security-Policy",
+                        "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+                .hasValue("Referrer-Policy", "no-referrer")
+                .hasValue("X-Content-Type-Options", "nosniff")
+                .hasValue("X-Frame-Options", "DENY")
+                .hasValue("Cross-Origin-Opener-Policy", "same-origin")
+                .hasValue("Cross-Origin-Resource-Policy", "same-origin")
+                .containsHeader("Permissions-Policy");
+    }
+
+    @Test
+    @WithMockUser
     void unknownApiRouteReturnsAProblemDocument() {
         assertThat(mvc.get().uri("/api/v1/unknown"))
                 .hasStatus(HttpStatus.NOT_FOUND)

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import io.github.jakiwz.aether.colonies.domain.Colony;
 import io.github.jakiwz.aether.colonies.domain.ColonyService;
 import io.github.jakiwz.aether.colonies.domain.ColonyStatus;
+import io.github.jakiwz.aether.shared.security.SecurityConfig;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -17,10 +18,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -29,6 +32,8 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
  * Contract of {@code GET /api/v1/colonies} (ARES-101).
  */
 @WebMvcTest(ColonyController.class)
+@Import(SecurityConfig.class)
+@WithMockUser(authorities = "COLONY_READ")
 class ColonyControllerTest {
 
     @Autowired

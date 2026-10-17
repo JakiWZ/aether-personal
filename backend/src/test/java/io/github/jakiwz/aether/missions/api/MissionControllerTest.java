@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import io.github.jakiwz.aether.missions.domain.Mission;
 import io.github.jakiwz.aether.missions.domain.MissionErrorCode;
@@ -16,15 +17,18 @@ import io.github.jakiwz.aether.missions.domain.MissionType;
 import io.github.jakiwz.aether.missions.domain.SafetyLevel;
 import io.github.jakiwz.aether.shared.error.BusinessRuleViolationException;
 import io.github.jakiwz.aether.shared.error.ResourceNotFoundException;
+import io.github.jakiwz.aether.shared.security.SecurityConfig;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 import org.springframework.test.web.servlet.assertj.MvcTestResult;
@@ -33,6 +37,8 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
  * Contract of {@code /api/v1/missions} (PHX-201).
  */
 @WebMvcTest(MissionController.class)
+@Import(SecurityConfig.class)
+@WithMockUser(authorities = {"MISSION_READ", "MISSION_MANAGE"})
 class MissionControllerTest {
 
     private static final String VALID_BODY = """
@@ -155,7 +161,7 @@ class MissionControllerTest {
     }
 
     private MvcTestResult post(String body) {
-        return mvc.post().uri("/api/v1/missions")
+        return mvc.post().uri("/api/v1/missions").with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(body)
                 .exchange();

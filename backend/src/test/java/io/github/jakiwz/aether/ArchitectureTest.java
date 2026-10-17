@@ -5,6 +5,7 @@ import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPac
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
@@ -20,6 +21,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -37,10 +40,11 @@ class ArchitectureTest {
      * add it here in the same pull request that needs it.
      */
     private static final Map<String, Set<String>> ALLOWED_FEATURE_DEPENDENCIES = Map.of(
+            "audit", Set.of(),
             "colonies", Set.of(),
-            "crew", Set.of("colonies"),
-            "identity", Set.of(),
-            "missions", Set.of("colonies", "identity"));
+            "crew", Set.of("audit", "colonies"),
+            "identity", Set.of("audit"),
+            "missions", Set.of("audit", "colonies", "identity"));
 
     private static final JavaClasses PRODUCTION = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
@@ -143,6 +147,19 @@ class ArchitectureTest {
         fields().that().areDeclaredInClassesThat().haveSimpleNameEndingWith("Request")
                 .and().haveRawType(String.class)
                 .should().beAnnotatedWith(PlainText.class).orShould().beAnnotatedWith(Pattern.class)
+                .check(PRODUCTION);
+    }
+
+    /**
+     * OWASP API5:2023 (broken function level authorization): every endpoint states the permission it
+     * needs, so a new one cannot ship open by omission. {@code permitAll()} has to be written out too.
+     */
+    @Test
+    void everyEndpointDeclaresItsPermission() {
+        methods().that().areDeclaredInClassesThat().areAnnotatedWith(RestController.class)
+                .and().areDeclaredInClassesThat().resideInAPackage(ROOT + ".*.api..")
+                .and().areMetaAnnotatedWith(RequestMapping.class)
+                .should().beAnnotatedWith(PreAuthorize.class)
                 .check(PRODUCTION);
     }
 }

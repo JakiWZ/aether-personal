@@ -21,11 +21,15 @@ Profile `dev` (or `demo`) also loads the demo dataset from `db/demo`
 | URL | What |
 |-----|------|
 | http://localhost:8080/actuator/health | Liveness/readiness |
-| http://localhost:8080/swagger-ui.html | Interactive API docs |
+| http://localhost:8080/swagger-ui.html | Interactive API docs (`dev` profile or `AETHER_API_DOCS_ENABLED=true`, ADR-0013) |
 | http://localhost:8080/v3/api-docs | OpenAPI contract (JSON) |
 
 Configuration comes from environment variables (defaults match Docker Compose):
 `AETHER_DB_HOST`, `AETHER_DB_PORT`, `AETHER_DB_NAME`, `AETHER_DB_USER`, `AETHER_DB_PASSWORD`.
+See [`.env.example`](../.env.example) for the rest, including `AETHER_LOG_FORMAT=ecs` for JSON logs (ADR-0014).
+
+Every response carries an `X-Request-ID` header. The same id appears in the log lines and the
+`audit_event` rows of that request, so it is the thing to quote when reporting a problem.
 
 ## Test
 
@@ -42,6 +46,7 @@ Package by feature under `io.github.jakiwz.aether`:
 shared/
   config/   cross-cutting configuration (OpenAPI, …)
   error/    RFC 9457 error contract: exceptions + GlobalExceptionHandler
+audit/      append-only audit trail (AuditTrail), used by the other domains (ADR-0014)
 <domain>/   one package per domain (crew, colonies, missions, fleet, inventory, incidents)
   api/          controllers + request/response records
   domain/       services with business rules (@Transactional)
