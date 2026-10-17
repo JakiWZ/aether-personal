@@ -26,7 +26,9 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
  * lockout, the logout and the writes land in {@code audit_event} with their account, client
  * address and the request's correlation id. Every test uses its own account.
  */
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+// every login comes from 127.0.0.1: the per-address limit is tested on its own in LoginRateLimitIT
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
+        properties = "aether.security.login.rate-limit.max-attempts=1000")
 @ActiveProfiles("demo")
 @Testcontainers
 class AuditTrailIT {

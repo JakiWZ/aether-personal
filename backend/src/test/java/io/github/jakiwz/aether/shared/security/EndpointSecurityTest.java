@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import io.github.jakiwz.aether.colonies.domain.ColonyService;
 import io.github.jakiwz.aether.crew.domain.CrewMemberService;
+import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
 import io.github.jakiwz.aether.identity.domain.LoginService;
 import io.github.jakiwz.aether.missions.domain.MissionService;
 import java.util.List;
@@ -65,6 +66,9 @@ class EndpointSecurityTest {
 
     @MockitoBean
     LoginService logins;
+
+    @MockitoBean
+    LoginRateLimiter rateLimiter;
 
     static Stream<Arguments> endpoints() {
         return Stream.of(

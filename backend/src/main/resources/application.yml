@@ -51,6 +51,10 @@ aether:
     login:                             # IAM-008: lock an account after repeated failures (ADR-0012)
       max-failed-attempts: 5
       lock-duration: 15m
+      rate-limit:                      # per client address, whatever the account (ADR-0012)
+        max-attempts: 10
+        window: 1m
+        max-tracked-addresses: 10000
 
 server:
   servlet:

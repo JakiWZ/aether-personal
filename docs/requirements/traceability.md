@@ -21,7 +21,7 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 | IAM-005 | Autorizzazioni | ✅ | #56 | EndpointSecurityTest, ArchitectureTest (permesso su ogni endpoint) |
 | IAM-006 | Profilo personale | ⬜ | — |  |
 | IAM-007 | Sessione e logout | ✅ | #56 | AuthenticationIT (timeout, logout, nuova sessione al login) |
-| IAM-008 | Tentativi falliti | ✅ | #56, #97 | AuthenticationIT (blocco dopo 5 tentativi), AuditTrailIT |
+| IAM-008 | Tentativi falliti | ✅ | #56, #97, #101 | AuthenticationIT (blocco dopo 5 tentativi), LoginRateLimitIT (limite per indirizzo), AuditTrailIT |
 
 ## Colonie e asset
 

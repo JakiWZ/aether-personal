@@ -37,6 +37,18 @@ Option 1, with Spring Security.
 - After **5 consecutive failures** the account is locked for **15 minutes**
   (`aether.security.login.*`). NIST SP 800-63B-4 allows up to 100; we choose fewer because there
   is no second factor yet. The price is that someone can lock a known username for 15 minutes.
+- **Per-address throttling** (added by #101). A client address may try at most **10 logins per minute**,
+  whatever the accounts (`aether.security.login.rate-limit.*`). The account lockout alone does not
+  stop password spraying or credential stuffing, which try few passwords on many accounts. It also
+  does not stop a flood of Argon2id hashes (OWASP Authentication Cheat Sheet; API4:2023).
+  - Past the limit the answer is `429 TOO_MANY_LOGIN_ATTEMPTS` with `Retry-After`, before any
+    password check, account update or audit write.
+  - Windows are fixed and kept in memory, at most `max-tracked-addresses` of them (10,000). When the
+    table is full, new addresses are let through to the account lockout instead of being refused,
+    so a botnet cannot lock everyone out.
+  - With several instances each node keeps its own counters. A shared limiter, at the reverse proxy
+    or in Redis, belongs to the deployment story.
+  - The address is the TCP peer, so the same `forward-headers-strategy` caveat applies as in ADR-0014.
 - Usernames are matched in lower case. Passwords are never logged (`LoginRequest#toString`).
 
 **Session**
@@ -86,7 +98,7 @@ Option 1, with Spring Security.
   method and enforced by a build rule.
 - Bad: sessions are server state (one node is fine now; several nodes will need a shared session
   store such as Spring Session JDBC). The SPA and the API must share an origin.
-- Follow-ups: audit of login events in `audit_event` (IAM-008, NFR-009); account administration
+- Follow-ups: account administration
   (IAM-001/003); security response headers and Swagger only in development.
 
 ## References
