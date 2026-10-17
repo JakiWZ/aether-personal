@@ -18,6 +18,7 @@ public final class ErrorCode {
     public static final String PAYLOAD_TOO_LARGE = "PAYLOAD_TOO_LARGE";
     public static final String AUTHENTICATION_REQUIRED = "AUTHENTICATION_REQUIRED";
     public static final String INVALID_CREDENTIALS = "INVALID_CREDENTIALS";
+    public static final String TOO_MANY_LOGIN_ATTEMPTS = "TOO_MANY_LOGIN_ATTEMPTS";
     public static final String ACCESS_DENIED = "ACCESS_DENIED";
     public static final String CSRF_TOKEN_INVALID = "CSRF_TOKEN_INVALID";
     public static final String DATA_INTEGRITY_VIOLATION = "DATA_INTEGRITY_VIOLATION";

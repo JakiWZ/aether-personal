@@ -3,14 +3,18 @@ package io.github.jakiwz.aether.identity.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import io.github.jakiwz.aether.identity.domain.AuthenticatedUser;
+import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
 import io.github.jakiwz.aether.identity.domain.LoginService;
+import io.github.jakiwz.aether.shared.error.TooManyLoginAttemptsException;
 import io.github.jakiwz.aether.shared.security.SecurityConfig;
 import jakarta.servlet.http.HttpSession;
+import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -43,6 +47,9 @@ class AuthControllerTest {
     @MockitoBean
     LoginService logins;
 
+    @MockitoBean
+    LoginRateLimiter rateLimiter;
+
     @Test
     void tellsAnAnonymousVisitorNobodyIsSignedIn() {
         // the XSRF-TOKEN cookie is checked in AuthenticationIT: csrf() here swaps the token store
@@ -68,6 +75,19 @@ class AuthControllerTest {
                 HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY);
         assertThat(context.getAuthentication().getAuthorities()).extracting(Object::toString)
                 .containsExactlyInAnyOrder("MISSION_MANAGE", "MISSION_READ", "ROLE_MISSION_CONTROLLER");
+    }
+
+    @Test
+    void throttlesAnAddressBeforeCheckingAnyPassword() {
+        willThrow(new TooManyLoginAttemptsException(Duration.ofSeconds(42))).given(rateLimiter).acquire(any());
+
+        MvcTestResult result = login("""
+                {"username":"mc.rossi","password":"Aether-demo-password"}""");
+
+        assertThat(result).hasStatus(HttpStatus.TOO_MANY_REQUESTS).hasHeader("Retry-After", "42")
+                .bodyJson().extractingPath("$.code").isEqualTo("TOO_MANY_LOGIN_ATTEMPTS");
+        verify(logins, never()).login(any(), any());
+        assertThat(result.getMvcResult().getRequest().getSession(false)).isNull();
     }
 
     @Test

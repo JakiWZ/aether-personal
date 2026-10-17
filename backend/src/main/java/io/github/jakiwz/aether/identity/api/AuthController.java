@@ -1,6 +1,7 @@
 package io.github.jakiwz.aether.identity.api;
 
 import io.github.jakiwz.aether.identity.domain.AuthenticatedUser;
+import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
 import io.github.jakiwz.aether.identity.domain.LoginService;
 import io.github.jakiwz.aether.shared.error.InvalidCredentialsException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,12 +39,15 @@ import org.springframework.web.bind.annotation.RestController;
 class AuthController {
 
     private final LoginService logins;
+    private final LoginRateLimiter rateLimiter;
     private final SecurityContextRepository securityContexts;
     private final ChangeSessionIdAuthenticationStrategy sessionFixation = new ChangeSessionIdAuthenticationStrategy();
     private final CsrfAuthenticationStrategy csrfRotation;
 
-    AuthController(LoginService logins, SecurityContextRepository securityContexts, CsrfTokenRepository csrfTokens) {
+    AuthController(LoginService logins, LoginRateLimiter rateLimiter, SecurityContextRepository securityContexts,
+            CsrfTokenRepository csrfTokens) {
         this.logins = logins;
+        this.rateLimiter = rateLimiter;
         this.securityContexts = securityContexts;
         this.csrfRotation = new CsrfAuthenticationStrategy(csrfTokens);
     }
@@ -64,8 +68,10 @@ class AuthController {
     @Operation(summary = "Sign in", description = "Starts a session cookie. The same error for every failure.")
     @ApiResponse(responseCode = "401", description = "INVALID_CREDENTIALS")
     @ApiResponse(responseCode = "403", description = "CSRF_TOKEN_INVALID: call GET /auth/session first")
+    @ApiResponse(responseCode = "429", description = "TOO_MANY_LOGIN_ATTEMPTS from this address: see Retry-After")
     SessionResponse login(@Valid @RequestBody LoginRequest login, HttpServletRequest request,
             HttpServletResponse response) {
+        rateLimiter.acquire(request.getRemoteAddr());
         AuthenticatedUser user = logins.login(login.username(), login.password())
                 .orElseThrow(InvalidCredentialsException::new);
         Authentication authentication = UsernamePasswordAuthenticationToken.authenticated(user, null,

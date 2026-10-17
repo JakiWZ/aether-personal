@@ -41,6 +41,14 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem(ex.status(), ex.code(), ex.getMessage());
     }
 
+    /** A throttled login: the problem plus {@code Retry-After}, so a client knows when to retry. */
+    @ExceptionHandler(TooManyLoginAttemptsException.class)
+    ResponseEntity<ProblemDetail> handleTooManyLoginAttempts(TooManyLoginAttemptsException ex) {
+        return ResponseEntity.status(ex.status())
+                .header(HttpHeaders.RETRY_AFTER, Long.toString(ex.retryAfterSeconds()))
+                .body(problem(ex.status(), ex.code(), ex.getMessage()));
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     ProblemDetail handleConstraintViolation(ConstraintViolationException ex) {
         List<FieldViolation> errors = ex.getConstraintViolations().stream()
