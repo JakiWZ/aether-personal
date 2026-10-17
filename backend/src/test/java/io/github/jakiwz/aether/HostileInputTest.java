@@ -8,6 +8,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import io.github.jakiwz.aether.colonies.domain.ColonyService;
 import io.github.jakiwz.aether.crew.domain.CrewMemberService;
+import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
 import io.github.jakiwz.aether.identity.domain.LoginService;
 import io.github.jakiwz.aether.missions.domain.Mission;
 import io.github.jakiwz.aether.missions.domain.MissionPriority;
@@ -69,6 +70,9 @@ class HostileInputTest {
 
     @MockitoBean
     LoginService logins;
+
+    @MockitoBean
+    LoginRateLimiter rateLimiter;
 
     static Stream<Arguments> hostileMissions() {
         return Stream.of(

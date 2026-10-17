@@ -26,7 +26,9 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
  * the cookies a browser gets, the generic failure, the lockout, and what each role may do.
  * Every test signs in with its own account, so lockouts and logouts do not leak between tests.
  */
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+// every login comes from 127.0.0.1: the per-address limit is tested on its own in LoginRateLimitIT
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
+        properties = "aether.security.login.rate-limit.max-attempts=1000")
 @ActiveProfiles("demo")
 @Testcontainers
 class AuthenticationIT {
