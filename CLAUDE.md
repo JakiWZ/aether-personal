@@ -19,7 +19,7 @@ atomic transfers, auditable state changes) must hold **server-side**, never only
 | `backend/` | Spring Boot REST API (Java 21, Maven). Flyway migrations in `src/main/resources/db/migration`. |
 | `frontend/` | Angular 22 SPA (standalone components, signals, zoneless). Layout in `frontend/README.md`. |
 | `infrastructure/` | Docker Compose for local dev, later IaC. |
-| `docs/requirements/` | Client requirements (capitolato): functional reqs, business rules `BR-xxx`, NFRs. |
+| `docs/requirements/` | Client requirements (capitolato): functional reqs, business rules `BR-xxx`, NFRs; `traceability.md` maps each one to its issue, status and tests. |
 | `docs/sprints/` | Sprint mission packs with detailed acceptance criteria per story. |
 | `docs/adr/` | Architecture Decision Records (MADR). **Every significant technical decision gets one.** |
 | `docs/agile/` | Definition of Ready/Done, ceremonies, Git workflow. |
@@ -49,7 +49,8 @@ atomic transfers, auditable state changes) must hold **server-side**, never only
 
 Acceptance criteria met · builds · DB changes are versioned migrations · server-side validation ·
 consistent error responses · automated tests including **at least one negative case** ·
-PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture changed.
+PR reviewed, CI green, merged · docs/ADR updated when behaviour or architecture changed ·
+the rows of the covered requirements updated in `docs/requirements/traceability.md` (`TraceabilityMatrixTest`).
 
 ## Engineering standards
 
