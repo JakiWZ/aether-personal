@@ -27,4 +27,5 @@ Una Story è Done soltanto quando:
 - [ ] commenti della review risolti;
 - [ ] merge in `main`;
 - [ ] documentazione aggiornata se necessaria;
+- [ ] righe dei requisiti coperti aggiornate in [`traceability.md`](../requirements/traceability.md);
 - [ ] demo della funzionalità possibile.
