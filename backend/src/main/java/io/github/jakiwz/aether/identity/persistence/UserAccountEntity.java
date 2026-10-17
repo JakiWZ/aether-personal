@@ -81,7 +81,7 @@ public class UserAccountEntity {
         return lastLoginAt;
     }
 
-    /** A failed attempt; after {@code maxAttempts} in a row the account is locked until {@code lockedUntil}. */
+    /** A failed attempt; after {@code maxAttempts} in a row the account is locked until {@code lockUntil}. */
     public void recordFailedLogin(OffsetDateTime now, int maxAttempts, OffsetDateTime lockUntil) {
         failedLoginCount++;
         if (failedLoginCount >= maxAttempts) {

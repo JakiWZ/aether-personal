@@ -146,7 +146,7 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 | NFR-003 | Performance | 🟡 | #92 | Elenchi paginati con limite lato server (ADR-0011) |
 | NFR-004 | Scalabilità | ⬜ | #58, #59 |  |
 | NFR-005 | Affidabilità | 🟡 | — | Scritture transazionali; vincoli nel DB |
-| NFR-006 | Manutenibilità | ✅ | — | ArchitectureTest, ADR, CLAUDE.md |
+| NFR-006 | Manutenibilità | ✅ | — | ArchitectureTest, Error Prone e NullAway in compilazione (ADR-0015), ADR, CLAUDE.md |
 | NFR-007 | Testabilità | ✅ | #53 | Test di unità, di controller e di integrazione su PostgreSQL reale |
 | NFR-008 | Portabilità | 🟡 | #54 | Configurazione da variabili d'ambiente (.env.example) |
 | NFR-009 | Osservabilità | 🟡 | #97 | Log strutturati con correlation id, health check (AetherApplicationIT, CorrelationIdFilterTest); mancano le metriche |

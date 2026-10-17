@@ -92,6 +92,8 @@ the rows of the covered requirements updated in `docs/requirements/traceability.
   `.with(csrf())` on writes, and include the 401/403 negative cases.
 - Audit (ADR-0014): every state change and security event calls `AuditTrail` inside its transaction;
   no passwords or personal data in snapshots. Logs carry the request's `correlationId` (MDC).
+- Static analysis (ADR-0015): Error Prone and NullAway run in every `javac`; mark nullable values with
+  JSpecify `@Nullable` and fix findings instead of suppressing them.
 - Tests: JUnit 5 + AssertJ; integration tests with **Testcontainers PostgreSQL** (never H2);
   `@WebMvcTest` for controller contracts. Every business rule has a negative test.
 

@@ -63,8 +63,8 @@ public @interface PlainText {
         }
 
         private static boolean isBidiControl(char c) {
-            return (c >= '‪' && c <= '‮') || (c >= '⁦' && c <= '⁩')
-                    || c == '‎' || c == '‏' || c == '؜';
+            return (c >= '\u202a' && c <= '\u202e') || (c >= '\u2066' && c <= '\u2069')
+                    || c == '\u200e' || c == '\u200f' || c == '\u061c';
         }
     }
 }
