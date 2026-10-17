@@ -40,10 +40,11 @@ class ArchitectureTest {
      * add it here in the same pull request that needs it.
      */
     private static final Map<String, Set<String>> ALLOWED_FEATURE_DEPENDENCIES = Map.of(
+            "audit", Set.of(),
             "colonies", Set.of(),
-            "crew", Set.of("colonies"),
-            "identity", Set.of(),
-            "missions", Set.of("colonies", "identity"));
+            "crew", Set.of("audit", "colonies"),
+            "identity", Set.of("audit"),
+            "missions", Set.of("audit", "colonies", "identity"));
 
     private static final JavaClasses PRODUCTION = new ClassFileImporter()
             .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
