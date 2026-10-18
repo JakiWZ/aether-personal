@@ -8,6 +8,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import io.github.jakiwz.aether.colonies.domain.ColonyService;
 import io.github.jakiwz.aether.crew.domain.CrewMemberService;
+import io.github.jakiwz.aether.fleet.domain.VehicleService;
 import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
 import io.github.jakiwz.aether.identity.domain.LoginService;
 import io.github.jakiwz.aether.missions.domain.Mission;
@@ -43,7 +44,8 @@ import org.springframework.test.web.servlet.assertj.MvcTestResult;
  */
 @WebMvcTest
 @Import({JacksonConfig.class, SecurityConfig.class})
-@WithMockUser(authorities = {"MISSION_READ", "MISSION_MANAGE", "CREW_READ", "CREW_MANAGE", "COLONY_READ"})
+@WithMockUser(authorities = {"MISSION_READ", "MISSION_MANAGE", "CREW_READ", "CREW_MANAGE", "COLONY_READ",
+        "ASSET_READ"})
 class HostileInputTest {
 
     private static final String MISSION = """
@@ -67,6 +69,9 @@ class HostileInputTest {
 
     @MockitoBean
     ColonyService colonies;
+
+    @MockitoBean
+    VehicleService vehicles;
 
     @MockitoBean
     LoginService logins;
@@ -155,11 +160,13 @@ class HostileInputTest {
 
         MvcTestResult mission = mvc.get().uri("/api/v1/missions/{code}", longCode).exchange();
         MvcTestResult member = mvc.get().uri("/api/v1/crew-members/{code}", longCode).exchange();
+        MvcTestResult vehicle = mvc.get().uri("/api/v1/vehicles/{code}", longCode).exchange();
 
         assertProblem(mission, HttpStatus.BAD_REQUEST, "VALIDATION_FAILED");
         assertProblem(member, HttpStatus.BAD_REQUEST, "VALIDATION_FAILED");
+        assertProblem(vehicle, HttpStatus.BAD_REQUEST, "VALIDATION_FAILED");
         assertThat(mission).bodyJson().extractingPath("$.errors[0].message").asString().doesNotContain(longCode);
-        verifyNoInteractions(missions, crew);
+        verifyNoInteractions(missions, crew, vehicles);
     }
 
     @Test

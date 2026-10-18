@@ -1,0 +1,11 @@
+tr.inactive {
+  color: var(--aether-text-muted);
+}
+
+.status[data-status='AVAILABLE'] {
+  color: var(--aether-ok);
+}
+
+.status[data-status='OUT_OF_SERVICE'] {
+  color: var(--aether-danger);
+}
