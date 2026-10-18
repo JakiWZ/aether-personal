@@ -8,7 +8,7 @@ Ogni requisito del [capitolato](capitolato.md) con la storia che lo realizza, lo
 
 Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori dal piano attuale (Future Track o nessuna storia).
 
-**Copertura:** ✅ 13 · 🟡 22 · ⬜ 44 · ➖ 15 su 94 requisiti (aggiornata al 2026-10-18).
+**Copertura:** ✅ 13 · 🟡 23 · ⬜ 43 · ➖ 15 su 94 requisiti (aggiornata al 2026-10-18).
 
 ## Identità e accessi
 
@@ -85,7 +85,7 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 | MNT-003 | Assegnazione tecnico | ⬜ | #32 |  |
 | MNT-004 | Ricambi utilizzati | ⬜ | #33 |  |
 | MNT-005 | Stato intervento | ⬜ | #33 |  |
-| MNT-006 | Incidenti operativi | ⬜ | #43 |  |
+| MNT-006 | Incidenti operativi | 🟡 | #43 | Apertura su una base con stato OPEN, ora del server e prima voce della timeline (IncidentOpeningIT, IncidentControllerTest); collegamento a missioni e asset da fare |
 | MNT-007 | Escalation | ⬜ | #44 |  |
 | MNT-008 | Root cause | ⬜ | #47 |  |
 | MNT-009 | Storico asset | ⬜ | #33 |  |
@@ -132,7 +132,7 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 | BR-009 | Incidenti critici | ⬜ | #47 |  |
 | BR-010 | Cancellazione logica | 🟡 | #36 | Nessun endpoint di cancellazione; soft delete nello schema; una risorsa si disattiva senza perdere giacenze (ResourceCatalogIT) |
 | BR-011 | Orari | ✅ | #13, #22 | TIMESTAMPTZ in UTC; MissionControllerTest, HostileInputTest (istanti fuori range) |
-| BR-012 | Audit | 🟡 | #97, #36 | AuditTrailIT, ResourceCatalogIT (creazione e disattivazione risorse); da estendere a ruoli, stati missione, movimenti e incidenti |
+| BR-012 | Audit | 🟡 | #97, #36, #43 | AuditTrailIT, ResourceCatalogIT (creazione e disattivazione risorse), IncidentOpeningIT; da estendere a ruoli, stati missione, movimenti e transizioni degli incidenti |
 | BR-013 | Approvazioni | ⬜ | #23 |  |
 | BR-014 | Allarmi | ➖ | #57 |  |
 | BR-015 | Integrità referenziale | ✅ | #9 | Chiavi esterne in tutte le migrazioni; AetherApplicationIT, DemoDatasetIT |

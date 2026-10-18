@@ -1,0 +1,83 @@
+<h1>Report an incident</h1>
+<p class="intro">
+  Fields marked * are required. The incident is opened with status Open at the current time.
+</p>
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (formError(); as e) {
+    <div class="message error" role="alert">
+      <p>The incident could not be opened. {{ e.message }}</p>
+    </div>
+  }
+
+  <ng-template #fieldError let-name>
+    @if (showErrors(name)) {
+      <p class="field-error" [id]="name + '-error'">{{ errorMessage(name) }}</p>
+    }
+  </ng-template>
+
+  <div class="field">
+    <label for="colonyCode">Base *</label>
+    <select
+      id="colonyCode"
+      formControlName="colonyCode"
+      [attr.aria-invalid]="showErrors('colonyCode')"
+      [attr.aria-describedby]="showErrors('colonyCode') ? 'colonyCode-error' : null"
+    >
+      <option value="">Choose a base</option>
+      @for (c of colonies(); track c.code) {
+        <option [value]="c.code">{{ c.code }} · {{ c.name }}</option>
+      }
+    </select>
+    @if (coloniesError()) {
+      <p class="field-error" role="alert">The bases could not be loaded.</p>
+    }
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'colonyCode' }" />
+  </div>
+
+  <div class="field">
+    <label for="title">Title *</label>
+    <input
+      id="title"
+      formControlName="title"
+      [attr.aria-invalid]="showErrors('title')"
+      [attr.aria-describedby]="showErrors('title') ? 'title-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'title' }" />
+  </div>
+
+  <div class="field">
+    <label for="description">Description *</label>
+    <textarea
+      id="description"
+      formControlName="description"
+      rows="4"
+      [attr.aria-invalid]="showErrors('description')"
+      [attr.aria-describedby]="showErrors('description') ? 'description-error' : null"
+    ></textarea>
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'description' }" />
+  </div>
+
+  <div class="field">
+    <label for="severity">Severity *</label>
+    <select
+      id="severity"
+      formControlName="severity"
+      [attr.aria-invalid]="showErrors('severity')"
+      [attr.aria-describedby]="showErrors('severity') ? 'severity-error' : null"
+    >
+      <option value="">Choose a severity</option>
+      @for (s of severities; track s) {
+        <option [value]="s">{{ severityLabels[s] }}: {{ severityHints[s] }}</option>
+      }
+    </select>
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'severity' }" />
+  </div>
+
+  <div class="actions">
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Opening…' : 'Open incident' }}
+    </button>
+    <a routerLink="..">Cancel</a>
+  </div>
+</form>

@@ -26,6 +26,8 @@ export type Permission =
   | 'COLONY_READ'
   | 'CREW_READ'
   | 'CREW_MANAGE'
+  | 'INCIDENT_READ'
+  | 'INCIDENT_REPORT'
   | 'INVENTORY_READ'
   | 'INVENTORY_MANAGE'
   | 'MISSION_READ'
