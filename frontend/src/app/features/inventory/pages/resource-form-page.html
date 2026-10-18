@@ -1,0 +1,105 @@
+<h1>New resource</h1>
+<p class="intro">
+  Fields marked * are required. The code must not be in use already and the unit of measure is
+  always chosen explicitly.
+</p>
+
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  @if (formError(); as e) {
+    <div class="message error" role="alert">
+      <p>The resource could not be added. {{ e.message }}</p>
+    </div>
+  }
+
+  <ng-template #fieldError let-name>
+    @if (showErrors(name)) {
+      <p class="field-error" [id]="name + '-error'">{{ errorMessage(name) }}</p>
+    }
+  </ng-template>
+
+  <div class="field">
+    <label for="code">Code *</label>
+    <input
+      id="code"
+      formControlName="code"
+      autocomplete="off"
+      [attr.aria-invalid]="showErrors('code')"
+      [attr.aria-describedby]="showErrors('code') ? 'code-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'code' }" />
+  </div>
+
+  <div class="field">
+    <label for="name">Name *</label>
+    <input
+      id="name"
+      formControlName="name"
+      [attr.aria-invalid]="showErrors('name')"
+      [attr.aria-describedby]="showErrors('name') ? 'name-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'name' }" />
+  </div>
+
+  <div class="field">
+    <label for="category">Category *</label>
+    <select
+      id="category"
+      formControlName="category"
+      [attr.aria-invalid]="showErrors('category')"
+      [attr.aria-describedby]="showErrors('category') ? 'category-error' : null"
+    >
+      <option value="">Choose a category</option>
+      @for (c of categories; track c) {
+        <option [value]="c">{{ categoryLabels[c] }}</option>
+      }
+    </select>
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'category' }" />
+  </div>
+
+  <div class="field">
+    <label for="unitCode">Unit of measure *</label>
+    <select
+      id="unitCode"
+      formControlName="unitCode"
+      [attr.aria-invalid]="showErrors('unitCode')"
+      [attr.aria-describedby]="showErrors('unitCode') ? 'unitCode-error' : null"
+    >
+      <option value="">Choose a unit</option>
+      @for (u of units(); track u.code) {
+        <option [value]="u.code">{{ u.name }} ({{ u.symbol }})</option>
+      }
+    </select>
+    @if (unitsError()) {
+      <p class="field-error" role="alert">The units of measure could not be loaded.</p>
+    }
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'unitCode' }" />
+  </div>
+
+  <div class="field">
+    <label>
+      <input type="checkbox" id="critical" formControlName="critical" />
+      Critical: running out endangers the crew
+    </label>
+  </div>
+
+  <div class="field">
+    <label for="shelfLifeDays">Shelf life (days)</label>
+    <input
+      id="shelfLifeDays"
+      type="number"
+      min="1"
+      max="36500"
+      formControlName="shelfLifeDays"
+      [attr.aria-invalid]="showErrors('shelfLifeDays')"
+      [attr.aria-describedby]="showErrors('shelfLifeDays') ? 'shelfLifeDays-error' : null"
+    />
+    <ng-container *ngTemplateOutlet="fieldError; context: { $implicit: 'shelfLifeDays' }" />
+  </div>
+
+  <div class="actions">
+    <button type="submit" [disabled]="submitting()">
+      {{ submitting() ? 'Adding…' : 'Add resource' }}
+    </button>
+    <a routerLink="..">Cancel</a>
+  </div>
+</form>
