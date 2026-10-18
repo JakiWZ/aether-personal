@@ -13,7 +13,7 @@ import { ANONYMOUS } from './core/auth/auth.service';
 import { TEST_CONFIG, provideTestConfig, signIn } from './testing/test-config';
 
 /** Domains whose landing route is a real screen instead of the placeholder named after the domain. */
-const LANDING_PAGES: Partial<Record<string, string>> = { colonies: 'Bases' };
+const LANDING_PAGES: Partial<Record<string, string>> = { colonies: 'Bases', fleet: 'Fleet' };
 
 describe('App routing', () => {
   beforeEach(() => {

@@ -43,6 +43,7 @@ class ArchitectureTest {
             "audit", Set.of(),
             "colonies", Set.of(),
             "crew", Set.of("audit", "colonies"),
+            "fleet", Set.of("colonies"),
             "identity", Set.of("audit"),
             "missions", Set.of("audit", "colonies", "identity"));
 

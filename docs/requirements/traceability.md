@@ -8,7 +8,7 @@ Ogni requisito del [capitolato](capitolato.md) con la storia che lo realizza, lo
 
 Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori dal piano attuale (Future Track o nessuna storia).
 
-**Copertura:** ✅ 11 · 🟡 20 · ⬜ 48 · ➖ 15 su 94 requisiti (aggiornata al 2026-10-17).
+**Copertura:** ✅ 11 · 🟡 22 · ⬜ 46 · ➖ 15 su 94 requisiti (aggiornata al 2026-10-18).
 
 ## Identità e accessi
 
@@ -29,11 +29,11 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 |---|---|---|---|---|
 | COL-001 | Anagrafica colonia | 🟡 | #15, #16 | Elenco: ColonyListIT, ColonyControllerTest; dettaglio in #16 |
 | COL-002 | Struttura habitat | ⬜ | #16 |  |
-| COL-003 | Asset tecnici | ⬜ | #29 |  |
+| COL-003 | Asset tecnici | 🟡 | #29 | Catalogo veicoli in sola lettura (VehicleCatalogIT, VehicleControllerTest); registrazione e altri asset da fare |
 | COL-004 | Stato asset | ⬜ | #30 |  |
 | COL-005 | Responsabile asset | ⬜ | — |  |
-| COL-006 | Disattivazione | 🟡 | #16 | Soft delete nello schema; una base inattiva non avvia missioni (MissionCreationIT) |
-| COL-007 | Ricerca e filtri | ⬜ | — |  |
+| COL-006 | Disattivazione | 🟡 | #16, #29 | Soft delete nello schema; una base inattiva non avvia missioni (MissionCreationIT); un veicolo dismesso resta nel catalogo (VehicleCatalogIT) |
+| COL-007 | Ricerca e filtri | 🟡 | #29 | Veicoli filtrati per stato (VehicleCatalogIT); colonia, tipo e criticità da fare |
 
 ## Equipaggio
 

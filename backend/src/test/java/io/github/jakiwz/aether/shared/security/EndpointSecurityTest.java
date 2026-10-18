@@ -7,6 +7,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 import io.github.jakiwz.aether.colonies.domain.ColonyService;
 import io.github.jakiwz.aether.crew.domain.CrewMemberService;
+import io.github.jakiwz.aether.fleet.domain.VehicleService;
 import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
 import io.github.jakiwz.aether.identity.domain.LoginService;
 import io.github.jakiwz.aether.missions.domain.MissionService;
@@ -40,7 +41,7 @@ class EndpointSecurityTest {
 
     /** Every permission an endpoint checks today. */
     private static final List<String> PERMISSIONS = List.of(
-            "COLONY_READ", "CREW_READ", "CREW_MANAGE", "MISSION_READ", "MISSION_MANAGE");
+            "ASSET_READ", "COLONY_READ", "CREW_READ", "CREW_MANAGE", "MISSION_READ", "MISSION_MANAGE");
 
     private static final String MISSION = """
             {"code":"PHX-020","title":"Jezero delta survey","objective":"Map the delta front",
@@ -65,6 +66,9 @@ class EndpointSecurityTest {
     ColonyService colonies;
 
     @MockitoBean
+    VehicleService vehicles;
+
+    @MockitoBean
     LoginService logins;
 
     @MockitoBean
@@ -78,7 +82,9 @@ class EndpointSecurityTest {
                 Arguments.of(HttpMethod.POST, "/api/v1/crew-members", CREW, "CREW_MANAGE"),
                 Arguments.of(HttpMethod.GET, "/api/v1/missions", null, "MISSION_READ"),
                 Arguments.of(HttpMethod.GET, "/api/v1/missions/PHX-001", null, "MISSION_READ"),
-                Arguments.of(HttpMethod.POST, "/api/v1/missions", MISSION, "MISSION_MANAGE"));
+                Arguments.of(HttpMethod.POST, "/api/v1/missions", MISSION, "MISSION_MANAGE"),
+                Arguments.of(HttpMethod.GET, "/api/v1/vehicles", null, "ASSET_READ"),
+                Arguments.of(HttpMethod.GET, "/api/v1/vehicles/ROV-ARS-01", null, "ASSET_READ"));
     }
 
     @ParameterizedTest(name = "{0} {1}")
@@ -88,7 +94,7 @@ class EndpointSecurityTest {
 
         assertProblem(result, HttpStatus.UNAUTHORIZED, "AUTHENTICATION_REQUIRED");
         assertThat(result).doesNotContainHeader(HttpHeaders.WWW_AUTHENTICATE);
-        verifyNoInteractions(missions, crew, colonies);
+        verifyNoInteractions(missions, crew, colonies, vehicles);
     }
 
     @ParameterizedTest(name = "{0} {1} needs {3}")
@@ -105,7 +111,7 @@ class EndpointSecurityTest {
                 .exchange();
 
         assertProblem(result, HttpStatus.FORBIDDEN, "ACCESS_DENIED");
-        verifyNoInteractions(missions, crew, colonies);
+        verifyNoInteractions(missions, crew, colonies, vehicles);
     }
 
     @Test
