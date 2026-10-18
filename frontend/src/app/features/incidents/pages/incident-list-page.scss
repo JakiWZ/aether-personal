@@ -1,0 +1,8 @@
+time {
+  white-space: nowrap;
+}
+
+.severity[data-severity='HIGH'],
+.severity[data-severity='CRITICAL'] {
+  color: var(--aether-danger);
+}

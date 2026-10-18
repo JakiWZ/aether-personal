@@ -16,6 +16,7 @@ import { TEST_CONFIG, provideTestConfig, signIn } from './testing/test-config';
 const LANDING_PAGES: Partial<Record<string, string>> = {
   colonies: 'Bases',
   fleet: 'Fleet',
+  incidents: 'Incidents',
   inventory: 'Resources',
 };
 

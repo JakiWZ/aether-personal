@@ -10,6 +10,7 @@ import io.github.jakiwz.aether.crew.domain.CrewMemberService;
 import io.github.jakiwz.aether.fleet.domain.VehicleService;
 import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
 import io.github.jakiwz.aether.identity.domain.LoginService;
+import io.github.jakiwz.aether.incidents.domain.IncidentService;
 import io.github.jakiwz.aether.inventory.domain.ResourceService;
 import io.github.jakiwz.aether.missions.domain.MissionService;
 import java.util.List;
@@ -42,14 +43,17 @@ class EndpointSecurityTest {
 
     /** Every permission an endpoint checks today. */
     private static final List<String> PERMISSIONS = List.of(
-            "ASSET_READ", "COLONY_READ", "CREW_READ", "CREW_MANAGE", "INVENTORY_READ", "INVENTORY_MANAGE",
-            "MISSION_READ", "MISSION_MANAGE");
+            "ASSET_READ", "COLONY_READ", "CREW_READ", "CREW_MANAGE", "INCIDENT_READ", "INCIDENT_REPORT",
+            "INVENTORY_READ", "INVENTORY_MANAGE", "MISSION_READ", "MISSION_MANAGE");
 
     private static final String MISSION = """
             {"code":"PHX-020","title":"Jezero delta survey","objective":"Map the delta front",
              "type":"EXPLORATION","originColonyCode":"ARS-01",
              "plannedStartAt":"2099-05-01T08:00:00Z","plannedEndAt":"2099-05-03T18:00:00Z",
              "priority":"HIGH","safetyLevel":"ELEVATED"}""";
+
+    private static final String INCIDENT = """
+            {"colonyCode":"ARS-01","title":"Airlock pressure drop","description":"Sealed","severity":"HIGH"}""";
 
     private static final String RESOURCE = """
             {"code":"CO2_SCRUBBER","name":"CO2 scrubber cartridge","category":"LIFE_SUPPORT","unitCode":"PCS",
@@ -78,6 +82,9 @@ class EndpointSecurityTest {
     ResourceService resources;
 
     @MockitoBean
+    IncidentService incidents;
+
+    @MockitoBean
     LoginService logins;
 
     @MockitoBean
@@ -94,6 +101,9 @@ class EndpointSecurityTest {
                 Arguments.of(HttpMethod.POST, "/api/v1/missions", MISSION, "MISSION_MANAGE"),
                 Arguments.of(HttpMethod.GET, "/api/v1/vehicles", null, "ASSET_READ"),
                 Arguments.of(HttpMethod.GET, "/api/v1/vehicles/ROV-ARS-01", null, "ASSET_READ"),
+                Arguments.of(HttpMethod.GET, "/api/v1/incidents", null, "INCIDENT_READ"),
+                Arguments.of(HttpMethod.GET, "/api/v1/incidents/INC-0001", null, "INCIDENT_READ"),
+                Arguments.of(HttpMethod.POST, "/api/v1/incidents", INCIDENT, "INCIDENT_REPORT"),
                 Arguments.of(HttpMethod.GET, "/api/v1/resources", null, "INVENTORY_READ"),
                 Arguments.of(HttpMethod.GET, "/api/v1/resources/WATER", null, "INVENTORY_READ"),
                 Arguments.of(HttpMethod.POST, "/api/v1/resources", RESOURCE, "INVENTORY_MANAGE"),
@@ -108,7 +118,7 @@ class EndpointSecurityTest {
 
         assertProblem(result, HttpStatus.UNAUTHORIZED, "AUTHENTICATION_REQUIRED");
         assertThat(result).doesNotContainHeader(HttpHeaders.WWW_AUTHENTICATE);
-        verifyNoInteractions(missions, crew, colonies, vehicles, resources);
+        verifyNoInteractions(missions, crew, colonies, vehicles, resources, incidents);
     }
 
     @ParameterizedTest(name = "{0} {1} needs {3}")
@@ -125,7 +135,7 @@ class EndpointSecurityTest {
                 .exchange();
 
         assertProblem(result, HttpStatus.FORBIDDEN, "ACCESS_DENIED");
-        verifyNoInteractions(missions, crew, colonies, vehicles, resources);
+        verifyNoInteractions(missions, crew, colonies, vehicles, resources, incidents);
     }
 
     @Test
