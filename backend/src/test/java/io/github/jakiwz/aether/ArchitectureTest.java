@@ -45,6 +45,7 @@ class ArchitectureTest {
             "crew", Set.of("audit", "colonies"),
             "fleet", Set.of("colonies"),
             "identity", Set.of("audit"),
+            "inventory", Set.of("audit"),
             "missions", Set.of("audit", "colonies", "identity"));
 
     private static final JavaClasses PRODUCTION = new ClassFileImporter()

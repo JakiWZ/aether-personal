@@ -1,0 +1,7 @@
+tr.inactive {
+  color: var(--aether-text-muted);
+}
+
+.activity[data-active='true'] {
+  color: var(--aether-ok);
+}

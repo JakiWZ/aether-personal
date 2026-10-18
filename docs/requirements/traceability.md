@@ -8,7 +8,7 @@ Ogni requisito del [capitolato](capitolato.md) con la storia che lo realizza, lo
 
 Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori dal piano attuale (Future Track o nessuna storia).
 
-**Copertura:** ✅ 11 · 🟡 22 · ⬜ 46 · ➖ 15 su 94 requisiti (aggiornata al 2026-10-18).
+**Copertura:** ✅ 13 · 🟡 22 · ⬜ 44 · ➖ 15 su 94 requisiti (aggiornata al 2026-10-18).
 
 ## Identità e accessi
 
@@ -66,8 +66,8 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 
 | Requisito | Titolo | Stato | Issue | Evidenza / note |
 |---|---|---|---|---|
-| LOG-001 | Catalogo risorse | ⬜ | #36 |  |
-| LOG-002 | Unità di misura | ⬜ | #36 |  |
+| LOG-001 | Catalogo risorse | ✅ | #36 | Creazione, consultazione e disattivazione: ResourceCatalogIT, ResourceControllerTest |
+| LOG-002 | Unità di misura | ✅ | #36 | Unità obbligatoria e scelta da elenco, mai dedotta dal nome (ResourceCatalogIT, ResourceControllerTest) |
 | LOG-003 | Giacenza | ⬜ | #37 |  |
 | LOG-004 | Movimenti | ⬜ | #38 |  |
 | LOG-005 | Lotti e scadenze | ⬜ | #83 |  |
@@ -121,7 +121,7 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 
 | Requisito | Titolo | Stato | Issue | Evidenza / note |
 |---|---|---|---|---|
-| BR-001 | Identificativi univoci | 🟡 | — | Codici univoci nel DB; MissionCreationIT, CrewMemberRegistrationIT, DemoDatasetIT |
+| BR-001 | Identificativi univoci | 🟡 | — | Codici univoci nel DB; MissionCreationIT, CrewMemberRegistrationIT, ResourceCatalogIT, DemoDatasetIT |
 | BR-002 | Missioni concluse | ⬜ | #23 |  |
 | BR-003 | Conflitto equipaggio | 🟡 | #26 | Vincolo di esclusione nel DB (DemoDatasetIT); manca il controllo nel servizio |
 | BR-004 | Certificazioni | ⬜ | #19, #24 |  |
@@ -130,9 +130,9 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 | BR-007 | Quantità negative | 🟡 | #38, #39 | CHECK quantity >= 0 nel DB (DemoDatasetIT); movimenti in #38 |
 | BR-008 | Campioni | ➖ | — |  |
 | BR-009 | Incidenti critici | ⬜ | #47 |  |
-| BR-010 | Cancellazione logica | 🟡 | — | Nessun endpoint di cancellazione; soft delete nello schema; audit solo in inserimento (ADR-0014) |
+| BR-010 | Cancellazione logica | 🟡 | #36 | Nessun endpoint di cancellazione; soft delete nello schema; una risorsa si disattiva senza perdere giacenze (ResourceCatalogIT) |
 | BR-011 | Orari | ✅ | #13, #22 | TIMESTAMPTZ in UTC; MissionControllerTest, HostileInputTest (istanti fuori range) |
-| BR-012 | Audit | 🟡 | #97 | AuditTrailIT; da estendere a ruoli, stati missione, inventario e incidenti |
+| BR-012 | Audit | 🟡 | #97, #36 | AuditTrailIT, ResourceCatalogIT (creazione e disattivazione risorse); da estendere a ruoli, stati missione, movimenti e incidenti |
 | BR-013 | Approvazioni | ⬜ | #23 |  |
 | BR-014 | Allarmi | ➖ | #57 |  |
 | BR-015 | Integrità referenziale | ✅ | #9 | Chiavi esterne in tutte le migrazioni; AetherApplicationIT, DemoDatasetIT |

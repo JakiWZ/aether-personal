@@ -11,6 +11,7 @@ import io.github.jakiwz.aether.crew.domain.CrewMemberService;
 import io.github.jakiwz.aether.fleet.domain.VehicleService;
 import io.github.jakiwz.aether.identity.domain.LoginRateLimiter;
 import io.github.jakiwz.aether.identity.domain.LoginService;
+import io.github.jakiwz.aether.inventory.domain.ResourceService;
 import io.github.jakiwz.aether.missions.domain.Mission;
 import io.github.jakiwz.aether.missions.domain.MissionPriority;
 import io.github.jakiwz.aether.missions.domain.MissionService;
@@ -72,6 +73,9 @@ class HostileInputTest {
 
     @MockitoBean
     VehicleService vehicles;
+
+    @MockitoBean
+    ResourceService resources;
 
     @MockitoBean
     LoginService logins;
