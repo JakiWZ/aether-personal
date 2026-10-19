@@ -2,13 +2,14 @@
 
 Ogni requisito del [capitolato](capitolato.md) con la storia che lo realizza, lo stato e l'evidenza che lo dimostra.
 È l'obiettivo misurabile del progetto: quando una storia chiude, la stessa PR aggiorna le sue righe.
+Le incongruenze tra capitolato e mission pack, con le decisioni del PO, sono in [open-questions.md](open-questions.md).
 `TraceabilityMatrixTest` (backend, `mvn test`) fallisce se:
 - un requisito manca o è sconosciuto;
 - un test citato non esiste.
 
 Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori dal piano attuale (Future Track o nessuna storia).
 
-**Copertura:** ✅ 11 · 🟡 20 · ⬜ 48 · ➖ 15 su 94 requisiti (aggiornata al 2026-10-17).
+**Copertura:** ✅ 13 · 🟡 23 · ⬜ 43 · ➖ 15 su 94 requisiti (aggiornata al 2026-10-18).
 
 ## Identità e accessi
 
@@ -29,11 +30,11 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 |---|---|---|---|---|
 | COL-001 | Anagrafica colonia | 🟡 | #15, #16 | Elenco: ColonyListIT, ColonyControllerTest; dettaglio in #16 |
 | COL-002 | Struttura habitat | ⬜ | #16 |  |
-| COL-003 | Asset tecnici | ⬜ | #29 |  |
+| COL-003 | Asset tecnici | 🟡 | #29 | Catalogo veicoli in sola lettura (VehicleCatalogIT, VehicleControllerTest); registrazione e altri asset da fare |
 | COL-004 | Stato asset | ⬜ | #30 |  |
 | COL-005 | Responsabile asset | ⬜ | — |  |
-| COL-006 | Disattivazione | 🟡 | #16 | Soft delete nello schema; una base inattiva non avvia missioni (MissionCreationIT) |
-| COL-007 | Ricerca e filtri | ⬜ | — |  |
+| COL-006 | Disattivazione | 🟡 | #16, #29 | Soft delete nello schema; una base inattiva non avvia missioni (MissionCreationIT); un veicolo dismesso resta nel catalogo (VehicleCatalogIT) |
+| COL-007 | Ricerca e filtri | 🟡 | #29 | Veicoli filtrati per stato (VehicleCatalogIT); colonia, tipo e criticità da fare |
 
 ## Equipaggio
 
@@ -66,8 +67,8 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 
 | Requisito | Titolo | Stato | Issue | Evidenza / note |
 |---|---|---|---|---|
-| LOG-001 | Catalogo risorse | ⬜ | #36 |  |
-| LOG-002 | Unità di misura | ⬜ | #36 |  |
+| LOG-001 | Catalogo risorse | ✅ | #36 | Creazione, consultazione e disattivazione: ResourceCatalogIT, ResourceControllerTest |
+| LOG-002 | Unità di misura | ✅ | #36 | Unità obbligatoria e scelta da elenco, mai dedotta dal nome (ResourceCatalogIT, ResourceControllerTest) |
 | LOG-003 | Giacenza | ⬜ | #37 |  |
 | LOG-004 | Movimenti | ⬜ | #38 |  |
 | LOG-005 | Lotti e scadenze | ⬜ | #83 |  |
@@ -85,7 +86,7 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 | MNT-003 | Assegnazione tecnico | ⬜ | #32 |  |
 | MNT-004 | Ricambi utilizzati | ⬜ | #33 |  |
 | MNT-005 | Stato intervento | ⬜ | #33 |  |
-| MNT-006 | Incidenti operativi | ⬜ | #43 |  |
+| MNT-006 | Incidenti operativi | 🟡 | #43 | Apertura su una base con stato OPEN, ora del server e prima voce della timeline (IncidentOpeningIT, IncidentControllerTest); collegamento a missioni e asset da fare |
 | MNT-007 | Escalation | ⬜ | #44 |  |
 | MNT-008 | Root cause | ⬜ | #47 |  |
 | MNT-009 | Storico asset | ⬜ | #33 |  |
@@ -121,7 +122,7 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 
 | Requisito | Titolo | Stato | Issue | Evidenza / note |
 |---|---|---|---|---|
-| BR-001 | Identificativi univoci | 🟡 | — | Codici univoci nel DB; MissionCreationIT, CrewMemberRegistrationIT, DemoDatasetIT |
+| BR-001 | Identificativi univoci | 🟡 | — | Codici univoci nel DB; MissionCreationIT, CrewMemberRegistrationIT, ResourceCatalogIT, DemoDatasetIT |
 | BR-002 | Missioni concluse | ⬜ | #23 |  |
 | BR-003 | Conflitto equipaggio | 🟡 | #26 | Vincolo di esclusione nel DB (DemoDatasetIT); manca il controllo nel servizio |
 | BR-004 | Certificazioni | ⬜ | #19, #24 |  |
@@ -130,9 +131,9 @@ Legenda: ✅ implementato e testato · 🟡 parziale · ⬜ da fare · ➖ fuori
 | BR-007 | Quantità negative | 🟡 | #38, #39 | CHECK quantity >= 0 nel DB (DemoDatasetIT); movimenti in #38 |
 | BR-008 | Campioni | ➖ | — |  |
 | BR-009 | Incidenti critici | ⬜ | #47 |  |
-| BR-010 | Cancellazione logica | 🟡 | — | Nessun endpoint di cancellazione; soft delete nello schema; audit solo in inserimento (ADR-0014) |
+| BR-010 | Cancellazione logica | 🟡 | #36 | Nessun endpoint di cancellazione; soft delete nello schema; una risorsa si disattiva senza perdere giacenze (ResourceCatalogIT) |
 | BR-011 | Orari | ✅ | #13, #22 | TIMESTAMPTZ in UTC; MissionControllerTest, HostileInputTest (istanti fuori range) |
-| BR-012 | Audit | 🟡 | #97 | AuditTrailIT; da estendere a ruoli, stati missione, inventario e incidenti |
+| BR-012 | Audit | 🟡 | #97, #36, #43 | AuditTrailIT, ResourceCatalogIT (creazione e disattivazione risorse), IncidentOpeningIT; da estendere a ruoli, stati missione, movimenti e transizioni degli incidenti |
 | BR-013 | Approvazioni | ⬜ | #23 |  |
 | BR-014 | Allarmi | ➖ | #57 |  |
 | BR-015 | Integrità referenziale | ✅ | #9 | Chiavi esterne in tutte le migrazioni; AetherApplicationIT, DemoDatasetIT |

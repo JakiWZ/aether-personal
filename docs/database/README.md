@@ -49,6 +49,8 @@ Reset everything: `docker compose -f infrastructure/docker-compose.yml down -v`.
 | V13 | Audit | `audit_event`, `outbox_event` |
 | V14 | Reference data | 8 roles, 22 permissions, role-permission matrix, 14 units of measure |
 | V15 | System account | Disabled `system` account that writes are attributed to until authentication exists (ADR-0008) |
+| V16 | Resource categories | `ck_resource_category`: closed list of resource categories (ORI-401) |
+| V17 | Incident reporting | `incident_code_seq` and `next_incident_number()` for system-assigned codes; `INCIDENT_REPORT` permission for every role but the auditor (HEL-501) |
 | R (demo) | Demo dataset | 4 bases, 19 crew, 10 missions in every state, fleet, stock, incidents ([details](demo-dataset.md)) |
 
 ## Business rules enforced by the database

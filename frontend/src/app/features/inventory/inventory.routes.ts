@@ -1,7 +1,16 @@
 import { Routes } from '@angular/router';
 
-import { FeaturePlaceholder } from '../../shared/ui/feature-placeholder/feature-placeholder';
+import { permissionGuard } from '../../core/auth/auth.guard';
+
+import { ResourceFormPage } from './pages/resource-form-page';
+import { ResourceListPage } from './pages/resource-list-page';
 
 export const INVENTORY_ROUTES: Routes = [
-  { path: '', component: FeaturePlaceholder, data: { domain: 'inventory' } },
+  { path: '', title: 'Resources', component: ResourceListPage },
+  {
+    path: 'new',
+    title: 'New resource',
+    canMatch: [permissionGuard('INVENTORY_MANAGE', '/inventory')],
+    component: ResourceFormPage,
+  },
 ];

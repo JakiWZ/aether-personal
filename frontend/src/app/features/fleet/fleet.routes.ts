@@ -1,7 +1,5 @@
 import { Routes } from '@angular/router';
 
-import { FeaturePlaceholder } from '../../shared/ui/feature-placeholder/feature-placeholder';
+import { VehicleListPage } from './pages/vehicle-list-page';
 
-export const FLEET_ROUTES: Routes = [
-  { path: '', component: FeaturePlaceholder, data: { domain: 'fleet' } },
-];
+export const FLEET_ROUTES: Routes = [{ path: '', title: 'Fleet', component: VehicleListPage }];

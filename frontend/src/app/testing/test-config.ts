@@ -30,7 +30,17 @@ export const SIGNED_IN: Session = {
   username: 'mc.rossi',
   displayName: 'Laura Rossi',
   roles: ['MISSION_CONTROLLER'],
-  permissions: ['COLONY_READ', 'CREW_READ', 'CREW_MANAGE', 'MISSION_READ', 'MISSION_MANAGE'],
+  permissions: [
+    'COLONY_READ',
+    'CREW_READ',
+    'CREW_MANAGE',
+    'INCIDENT_READ',
+    'INCIDENT_REPORT',
+    'INVENTORY_READ',
+    'INVENTORY_MANAGE',
+    'MISSION_READ',
+    'MISSION_MANAGE',
+  ],
 };
 
 /** Signs in through the real `AuthService`, answering its session request with `session`. */

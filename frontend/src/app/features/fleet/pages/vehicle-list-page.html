@@ -1,0 +1,67 @@
+<h1>Fleet</h1>
+<p class="intro">
+  Rovers, drones and shuttles of every base. Vehicles out of service or decommissioned stay in the
+  catalogue.
+</p>
+
+<div class="toolbar">
+  <label for="status-filter">Status</label>
+  <select id="status-filter" [value]="filter()" (change)="onFilterChange($event)">
+    <option value="all">All statuses</option>
+    @for (s of statuses; track s) {
+      <option [value]="s">{{ statusLabels[s] }}</option>
+    }
+  </select>
+</div>
+
+@if (error(); as e) {
+  <div class="message error" role="alert">
+    <p>The vehicles could not be loaded. {{ e.message }}</p>
+    <button type="button" (click)="load()">Retry</button>
+  </div>
+} @else if (vehiclePage(); as p) {
+  @if (p.totalItems === 0) {
+    <p class="message" role="status">
+      @if (filterLabel(); as label) {
+        No vehicles with status {{ label }}.
+      } @else {
+        No vehicles registered yet.
+      }
+    </p>
+  } @else {
+    <table>
+      <caption class="visually-hidden">
+        Fleet vehicles
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Code</th>
+          <th scope="col">Type</th>
+          <th scope="col">Model</th>
+          <th scope="col">Base</th>
+          <th scope="col">Criticality</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (v of p.items; track v.code) {
+          <tr [class.inactive]="!v.active">
+            <td class="code">{{ v.code }}</td>
+            <td>{{ v.typeName }}</td>
+            <td>{{ v.model ?? '—' }}</td>
+            <td>{{ v.colonyCode }}</td>
+            <td>{{ criticalityLabels[v.criticality] }}</td>
+            <td>
+              <span class="badge status" [attr.data-status]="v.status">{{
+                statusLabels[v.status]
+              }}</span>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <app-pager [page]="p" singular="vehicle" plural="vehicles" (pageChange)="load($event)" />
+  }
+} @else {
+  <p class="message" role="status">Loading vehicles…</p>
+}

@@ -23,7 +23,15 @@ export const ANONYMOUS: Session = {
 
 /** Permission codes the UI checks (backend `permission` table). */
 export type Permission =
-  'COLONY_READ' | 'CREW_READ' | 'CREW_MANAGE' | 'MISSION_READ' | 'MISSION_MANAGE';
+  | 'COLONY_READ'
+  | 'CREW_READ'
+  | 'CREW_MANAGE'
+  | 'INCIDENT_READ'
+  | 'INCIDENT_REPORT'
+  | 'INVENTORY_READ'
+  | 'INVENTORY_MANAGE'
+  | 'MISSION_READ'
+  | 'MISSION_MANAGE';
 
 /**
  * The signed-in user, kept in a signal. The session itself is an HttpOnly cookie the browser
