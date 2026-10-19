@@ -2,6 +2,7 @@
 
 Ogni requisito del [capitolato](capitolato.md) con la storia che lo realizza, lo stato e l'evidenza che lo dimostra.
 È l'obiettivo misurabile del progetto: quando una storia chiude, la stessa PR aggiorna le sue righe.
+Le incongruenze tra capitolato e mission pack, con le decisioni del PO, sono in [open-questions.md](open-questions.md).
 `TraceabilityMatrixTest` (backend, `mvn test`) fallisce se:
 - un requisito manca o è sconosciuto;
 - un test citato non esiste.
