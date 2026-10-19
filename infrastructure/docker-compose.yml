@@ -17,7 +17,7 @@ services:
       POSTGRES_USER: ${AETHER_DB_USER:-aether}
       POSTGRES_PASSWORD: ${AETHER_DB_PASSWORD:-aether}
     ports:
-      - "${AETHER_DB_PORT:-5432}:5432"
+      - "127.0.0.1:${AETHER_DB_PORT:-5432}:5432"   # local only, never on the LAN
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
